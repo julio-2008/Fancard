@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-green-primary: #0d5f38;
+  --color-green-deep: #083f28;
+  --color-yellow-primary: #f4c430;
+  --color-blue-primary: #164ea6;
+  --color-cream: #f7f3ea;
+  --color-cream-light: #fffaf0;
+  --color-ink: #163025;
+  --color-muted-text: #66786d;
+  --color-line-border: #dce6dd;
+  --color-soft-bg: #eef5ef;
+
+  --font-sans: "DM Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Animations and custom global styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-cream);
+  overflow-x: hidden;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.display {
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+
+.hero-overlay {
+  background:
+    linear-gradient(90deg, rgba(5, 34, 20, 0.95) 0%, rgba(5, 34, 20, 0.82) 48%, rgba(5, 34, 20, 0.42) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.26));
+}
+
+.step-line {
+  position: relative;
+}
+
+.step-line:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 23px;
+  top: 58px;
+  width: 2px;
+  height: 38px;
+  background: #cbd9cf;
+}
+
+.status-row {
+  position: relative;
+}
+
+.status-row:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 27px;
+  width: 2px;
+  height: calc(100% - 20px);
+  background: #dbe6dc;
+}
+
+/* Custom interactive card style */
+.bracket-node {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Chave FanCard - Estilo Playoff de Copa */
+.bracket-wrap {
+  background: linear-gradient(135deg, var(--color-green-deep) 0%, #042416 100%);
+  border: 1px solid rgba(244, 196, 48, 0.25);
+  backdrop-blur: 12px;
+  border-radius: 24px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(8, 63, 40, 0.22);
+}
+
+.bracket-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-yellow-primary), var(--color-green-primary), var(--color-blue-primary));
+}
+
+.bracket-round {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.bracket-round:last-child {
+  margin-bottom: 0;
+}
+
+.round-title {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--color-yellow-primary);
+  margin-bottom: 6px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.bracket-connector {
+  width: 2px;
+  height: 14px;
+  background: rgba(244, 196, 48, 0.2);
+  margin-left: 24px;
+  position: relative;
+}
+
+.bracket-connector::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  background: var(--color-yellow-primary);
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
