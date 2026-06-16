@@ -1,0 +1,8 @@
+{
+  "name": "FanCard BR",
+  "description": "Crie sua figurinha de copa personalizada com sua própria foto. Escolha seu pacote, envie sua foto, personalize seus atributos e acompanhe a produção em tempo real no nosso painel interativo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

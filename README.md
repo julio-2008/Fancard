@@ -1,5 +1,20 @@
-progeto de um site para a tendencia da copa do mundo 2026
-objetivo: tranformar fotos de pessoas reais em figurinhas personalizadas
-atravesde um site, o cliente faz seu pedido, escolhe seu pacote: individual com uma foto, trio com 3 foto e familia com 5 fotos
-ele preenche um formularios dos seus dados que estarao na figurinha, apos isso ele envia sua foto, faz o pagamento do pacote e aguarda em até 1 dia útil
-Os preço dos pacotes: [INDIVIDUAL R$14,90] [TRIO R$26,97 - 40% DE DESCONTO] [FAMILIA R$36,97 - 50% DE DESCONTO]
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
+
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/ed48d333-bb85-4526-a498-9fc6872b55e5
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
