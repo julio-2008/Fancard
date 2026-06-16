@@ -20,7 +20,15 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash === "#criar") {
+      const query = new URLSearchParams(window.location.search);
+      const queryOrderId = query.get("pedido") || query.get("orderId") || query.get("external_reference");
+      const queryToken = query.get("token") || "";
+
+      if (queryOrderId && queryToken) {
+        setOrderId(queryOrderId);
+        setOrderToken(queryToken);
+        setViewMode("pedido");
+      } else if (hash === "#criar") {
         setViewMode("order");
       } else if (hash.startsWith("#pedido/") || hash.startsWith("#/pedido/")) {
         // Formato esperado: #pedido/FC123456?token=tok_xxxxx ou #/pedido/FC123456?token=tok_xxxxx

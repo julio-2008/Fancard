@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { FancardPreview } from "./FancardPreview";
 import { Trophy, Check, ArrowRight, ShieldCheck, Mail, Sparkles, AlertCircle } from "lucide-react";
@@ -16,6 +16,21 @@ export const LandingView: React.FC<LandingViewProps> = ({
   onStartFlow,
   packagesRef,
 }) => {
+  const [feedbacks, setFeedbacks] = useState<Array<{
+    id: string;
+    name: string;
+    packageName: string;
+    rating: number;
+    comment: string;
+  }>>([]);
+
+  useEffect(() => {
+    fetch("/api/feedbacks/public")
+      .then((response) => response.ok ? response.json() : [])
+      .then((data) => setFeedbacks(Array.isArray(data) ? data : []))
+      .catch(() => setFeedbacks([]));
+  }, []);
+
   // Mock dos craques do Hero para visualização idêntica de figurinhas (sem dados técnicos desnecessários)
   const craqueVanessa = {
     name: "VANESSA SANTOS",
@@ -555,6 +570,37 @@ export const LandingView: React.FC<LandingViewProps> = ({
           </div>
         </div>
       </section>
+
+      {feedbacks.length > 0 && (
+        <section className="bg-white py-18 md:py-22 border-b border-line-border">
+          <div className="max-w-7xl mx-auto px-5 md:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <p className="mono text-green-primary font-bold mb-4 text-xs">
+                AVALIAÇÕES REAIS
+              </p>
+              <h2 className="display text-4xl md:text-5xl text-[#103c27]">
+                Quem recebeu já avaliou.
+              </h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {feedbacks.slice(0, 6).map((feedback) => (
+                <article key={feedback.id} className="border border-line-border rounded-2xl p-5 bg-cream-light">
+                  <div className="text-yellow-500 text-sm font-black mb-3">
+                    {"★".repeat(Math.max(1, Math.min(5, feedback.rating)))}
+                  </div>
+                  <p className="text-[#103c27] font-bold text-sm leading-relaxed">
+                    “{feedback.comment}”
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-line-border/70">
+                    <p className="text-xs font-black text-green-primary">{feedback.name}</p>
+                    <p className="text-[10px] text-[#65756b] font-bold mt-1">{feedback.packageName}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 6. BANNER FINAL / CALL-TO-ACTION */}
       <section 

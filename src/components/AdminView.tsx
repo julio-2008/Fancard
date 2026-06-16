@@ -79,6 +79,7 @@ export function AdminView({ onBackHome }: AdminViewProps) {
   // Orders State
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState<boolean>(false);
   const [ordersLoading, setOrdersLoading] = useState<boolean>(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   
@@ -238,7 +239,7 @@ export function AdminView({ onBackHome }: AdminViewProps) {
       setOrders(sorted);
       
       // Auto-select first order if none selected
-      if (sorted.length > 0 && !selectedOrderId) {
+      if (sorted.length > 0 && !selectedOrderId && window.innerWidth >= 768) {
         setSelectedOrderId(sorted[0].id);
       }
     } catch (err) {
@@ -493,7 +494,7 @@ export function AdminView({ onBackHome }: AdminViewProps) {
       <div className="flex-grow flex overflow-hidden min-h-[calc(100vh-4rem)]">
         
         {/* Pane Left: Inbox Sidebar */}
-        <div className="w-80 md:w-96 border-r border-[#1b3428] bg-[#081711] flex flex-col shrink-0 overflow-hidden">
+        <div className={`${mobileDetailOpen ? "hidden md:flex" : "flex"} w-full md:w-96 border-r border-[#1b3428] bg-[#081711] flex-col shrink-0 overflow-hidden`}>
           {/* Filter ribbon */}
           <div className="p-4 border-b border-[#1b3428] space-y-3 shrink-0">
             {/* Search Input */}
@@ -586,7 +587,10 @@ export function AdminView({ onBackHome }: AdminViewProps) {
                 return (
                   <button
                     key={o.id}
-                    onClick={() => setSelectedOrderId(o.id)}
+                    onClick={() => {
+                      setSelectedOrderId(o.id);
+                      setMobileDetailOpen(true);
+                    }}
                     className={`w-full text-left p-4.5 transition-all outline-none border-b border-[#1b3428]/25 flex flex-col gap-2 relative cursor-pointer ${
                       isActive ? "bg-[#102d20] border-l-4 border-l-[#ffc526]" : "hover:bg-[#0c2419]/50"
                     }`}
@@ -616,13 +620,19 @@ export function AdminView({ onBackHome }: AdminViewProps) {
         </div>
 
         {/* Pane Right: Detailed Preview & Editor Operations */}
-        <div className="flex-grow bg-[#09100c] overflow-y-auto p-6 md:p-8">
+        <div className={`${mobileDetailOpen ? "block" : "hidden md:block"} flex-grow bg-[#09100c] overflow-y-auto p-4 md:p-8`}>
           {selectedOrder ? (
             <div className="max-w-4xl space-y-8">
               
               {/* 1. SECTOR HEADER */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0d2118] p-6 border border-[#1b3428]/30 rounded-2xl">
                 <div>
+                  <button
+                    onClick={() => setMobileDetailOpen(false)}
+                    className="md:hidden mb-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#ffc526]"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Voltar aos pedidos
+                  </button>
                   <div className="flex items-center gap-3">
                     <span className="bg-black/30 text-[#ffc526] font-mono text-sm px-3 py-1 rounded-lg font-black">
                       #{selectedOrder.id}
@@ -748,7 +758,7 @@ export function AdminView({ onBackHome }: AdminViewProps) {
                               <img 
                                 src={item.photoUrl} 
                                 alt={item.cardData.name} 
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain bg-black"
                                 referrerPolicy="no-referrer"
                               />
                             </div>
@@ -822,6 +832,18 @@ export function AdminView({ onBackHome }: AdminViewProps) {
                             <div className="bg-[#0b2118] border border-[#1b3428]/30 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                               <div>
                                 <h4 className="font-black text-xs text-white">Anexar Arte Final (FanCard Pronta)</h4>
+                                {finalFile && (
+                                  <div className="mt-3 mb-3 flex items-center gap-3">
+                                    <img
+                                      src={finalFile.url}
+                                      alt={`Arte final ${item.index}`}
+                                      className="w-14 h-20 rounded-lg border border-emerald-700/50 object-contain bg-black"
+                                    />
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-300">
+                                      Upload final confirmado
+                                    </span>
+                                  </div>
+                                )}
                                 <p className="text-[10px] text-gray-400 mt-1">Gere a figurinha no ChatGPT Plus, revise e faça o upload em formato PNG ou JPG aqui.</p>
                               </div>
 
@@ -845,7 +867,7 @@ export function AdminView({ onBackHome }: AdminViewProps) {
                                     </>
                                   ) : (
                                     <>
-                                      <Upload className="w-3.5 h-3.5" /> Enviar Arte Pronta
+                                      <Upload className="w-3.5 h-3.5" /> {finalFile ? "Substituir Arte" : "Enviar Arte Pronta"}
                                     </>
                                   )}
                                   <input 

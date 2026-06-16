@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Check, Copy, Download, Loader2, ShieldCheck, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -46,6 +46,11 @@ interface Order {
     finalFiles: FinalFile[];
     adminNotes?: string;
   };
+  feedback?: {
+    rating: number;
+    comment: string;
+    createdAt: string;
+  };
 }
 
 interface PedidoStatusViewProps {
@@ -65,13 +70,86 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome }: PedidoSta
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [alertsEnabled, setAlertsEnabled] = useState(() => "Notification" in window && Notification.permission === "granted");
+  const audioRef = useRef<AudioContext | null>(null);
+  const lastReadyNotifiedRef = useRef<string | null>(null);
+
+  const playReadyAlert = () => {
+    try {
+      const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
+      if (!audioRef.current) audioRef.current = new AudioCtor();
+      const ctx = audioRef.current;
+      const gain = ctx.createGain();
+      gain.gain.value = 0.18;
+      gain.connect(ctx.destination);
+      [880, 1175, 1480].forEach((freq, index) => {
+        const osc = ctx.createOscillator();
+        osc.type = "square";
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        osc.start(ctx.currentTime + index * 0.18);
+        osc.stop(ctx.currentTime + index * 0.18 + 0.13);
+      });
+    } catch {
+      // Audio can be blocked until the customer taps the page.
+    }
+  };
+
+  const enableDeliveryAlerts = async () => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      const permission = await Notification.requestPermission();
+      setAlertsEnabled(permission === "granted");
+    } else {
+      setAlertsEnabled("Notification" in window && Notification.permission === "granted");
+    }
+
+    if ("serviceWorker" in navigator) {
+      try {
+        await navigator.serviceWorker.register("/sw.js");
+      } catch (err) {
+        console.warn("Nao foi possivel registrar as notificacoes do pedido:", err);
+      }
+    }
+
+    playReadyAlert();
+  };
+
+  const showReadyNotification = async (currentOrder: Order) => {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+    const notificationOptions: NotificationOptions = {
+      body: `Pedido #${currentOrder.id}: sua arte final foi liberada.`,
+      icon: "/assets/logo.png",
+      data: {
+        url: `${window.location.origin}/?pedido=${currentOrder.id}&token=${accessToken}`,
+      },
+    };
+
+    try {
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.register("/sw.js");
+        await registration.showNotification("FanCard pronta para baixar", notificationOptions);
+        return;
+      }
+    } catch (err) {
+      console.warn("Nao foi possivel exibir notificacao via service worker:", err);
+    }
+
+    new Notification("FanCard pronta para baixar", notificationOptions);
+  };
 
   useEffect(() => {
     const ready = order?.production.status === "ready" || order?.production.status === "delivered";
     if (order && ready && !order.feedback) {
       setShowFeedback(true);
     }
-  }, [order?.id, order?.production.status, order?.feedback]);
+
+    if (order && ready && lastReadyNotifiedRef.current !== order.id) {
+      lastReadyNotifiedRef.current = order.id;
+      playReadyAlert();
+      void showReadyNotification(order);
+    }
+  }, [order?.id, order?.production.status, order?.feedback, accessToken]);
 
   // Check query params in location
   const isSimulationParam = window.location.hash.includes("simulate_payment=true") || 
@@ -288,12 +366,12 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome }: PedidoSta
             </div>
             <textarea
               className="w-full border border-gray-200 rounded-2xl p-4 mb-6 min-h-[100px] text-sm"
-              placeholder="O que achou do tempo de produção, da qualidade da arte? (mín 10 caracteres)"
+              placeholder="O que achou do tempo de produção, da qualidade da arte? (mín 15 caracteres)"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
             <button
-              disabled={submitting || rating === 0 || comment.length < 10}
+              disabled={submitting || rating === 0 || comment.trim().length < 15}
               onClick={async () => {
                 setSubmitting(true);
                 await fetch(`/api/orders/${order.id}/feedback`, {
@@ -382,6 +460,12 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome }: PedidoSta
           </div>
 
           <div className="flex gap-2 w-full md:w-auto">
+            <button
+              onClick={enableDeliveryAlerts}
+              className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 border border-yellow-primary/40 hover:border-yellow-primary text-green-deep bg-yellow-primary/20 px-4 py-2.5 rounded-full text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+            >
+              {alertsEnabled ? "Alertas ativos" : "Ativar alerta"}
+            </button>
             <button
               onClick={handleCopyLink}
               className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 border border-green-primary/20 hover:border-green-primary text-green-primary bg-white px-4 py-2.5 rounded-full text-xs font-extrabold shadow-sm transition-all cursor-pointer"

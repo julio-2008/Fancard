@@ -309,11 +309,20 @@ export async function createApp(options: CreateAppOptions = {}) {
           email: buyer.email,
         },
         back_urls: {
-          success: `${cleanHostUrl}/#/pedido/${orderId}?token=${accessToken}&status=success`,
-          failure: `${cleanHostUrl}/#/pedido/${orderId}?token=${accessToken}&status=failure`,
-          pending: `${cleanHostUrl}/#/pedido/${orderId}?token=${accessToken}&status=pending`,
+          success: `${cleanHostUrl}/?pedido=${orderId}&token=${accessToken}&payment_status=success`,
+          failure: `${cleanHostUrl}/?pedido=${orderId}&token=${accessToken}&payment_status=failure`,
+          pending: `${cleanHostUrl}/?pedido=${orderId}&token=${accessToken}&payment_status=pending`,
         },
-        auto_return: "all",
+        auto_return: "approved",
+        payment_methods: {
+          default_payment_method_id: "pix",
+          excluded_payment_types: [
+            { id: "credit_card" },
+            { id: "debit_card" },
+            { id: "ticket" },
+          ],
+          installments: 1,
+        },
         statement_descriptor: "FANCARDBRASIL",
         external_reference: orderId,
         notification_url: `${cleanHostUrl}/api/mercadopago/webhook`,
@@ -599,7 +608,7 @@ export async function createApp(options: CreateAppOptions = {}) {
     const { orderId } = req.params;
     const { rating, comment } = req.body;
     
-    if (!rating || !comment || comment.length < 10) {
+    if (!rating || !comment || comment.trim().length < 15) {
       return res.status(400).json({ error: "Avaliação incompleta ou comentário muito curto." });
     }
 
@@ -618,6 +627,24 @@ export async function createApp(options: CreateAppOptions = {}) {
     
     await saveOrders(orders);
     return res.json({ status: "success" });
+  });
+
+  app.get("/api/feedbacks/public", async (_req, res) => {
+    const orders = await loadOrders();
+    const feedbacks = orders
+      .filter((order) => order.feedback && order.production.status !== "waiting_payment")
+      .sort((a, b) => new Date(b.feedback!.createdAt).getTime() - new Date(a.feedback!.createdAt).getTime())
+      .slice(0, 12)
+      .map((order) => ({
+        id: order.id,
+        name: order.buyer.name.split(" ").slice(0, 2).join(" "),
+        packageName: order.packageName,
+        rating: order.feedback!.rating,
+        comment: order.feedback!.comment,
+        createdAt: order.feedback!.createdAt,
+      }));
+
+    return res.json(feedbacks);
   });
 
 

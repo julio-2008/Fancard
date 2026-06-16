@@ -173,6 +173,11 @@ export async function saveBase64Image(
     return blob.url;
   }
 
+  if (process.env.VERCEL) {
+    const contentType = contentTypeFromFileName(safeFileName);
+    return `data:${contentType};base64,${cleanBase64}`;
+  }
+
   ensureDirs();
   const targetDir = type === "original" ? ORIGINAL_UPLOADS_DIR : FINAL_UPLOADS_DIR;
   const filePath = path.join(targetDir, uniqueName);

@@ -592,6 +592,12 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
 
     showToast("🚀 Pedido e faturamento gerados! Redirecionando...");
     localStorage.removeItem("fancardProgressData");
+    localStorage.setItem("fancardLastOrder", JSON.stringify({
+      orderId: data.orderId,
+      accessToken: data.accessToken,
+      checkoutUrl: data.checkoutUrl,
+      createdAt: new Date().toISOString(),
+    }));
 
     // Redirect immediately to Checkout Pro or simulated test window
     if (!data.checkoutUrl) {
