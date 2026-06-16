@@ -1,15 +1,21 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { BlobNotFoundError, get, put } from "@vercel/blob";
 
-const DATA_DIR = path.join(process.cwd(), "storage");
+const LOCAL_STORAGE_ROOT = process.env.VERCEL
+  ? path.join(os.tmpdir(), "fancard")
+  : process.cwd();
+const DATA_DIR = path.join(LOCAL_STORAGE_ROOT, "storage");
 const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
-const UPLOADS_DIR = path.join(process.cwd(), "uploads");
+const UPLOADS_DIR = path.join(LOCAL_STORAGE_ROOT, "uploads");
 const ORIGINAL_UPLOADS_DIR = path.join(UPLOADS_DIR, "original");
 const FINAL_UPLOADS_DIR = path.join(UPLOADS_DIR, "final");
 const ORDERS_BLOB_PATH = "fancard/database/orders.json";
 
 const shouldUseBlob = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+
+export const getUploadsDir = () => UPLOADS_DIR;
 
 function ensureDirs() {
   if (!fs.existsSync(DATA_DIR)) {

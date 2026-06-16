@@ -1,12 +1,12 @@
 import express from "express";
 import path from "path";
 import crypto from "crypto";
-import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import {
   loadOrders,
   saveOrders,
   saveBase64Image,
+  getUploadsDir,
   Order,
   FanCardItem,
   FinalFile,
@@ -28,7 +28,7 @@ export async function createApp(options: CreateAppOptions = {}) {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   // Static serving of uploaded customer files and final FanCards
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+  app.use("/uploads", express.static(getUploadsDir()));
 
   // Static assets
   app.use("/assets", express.static(path.join(process.cwd(), "public/assets")));
@@ -753,6 +753,7 @@ export async function createApp(options: CreateAppOptions = {}) {
 
   if (process.env.NODE_ENV !== "production") {
     console.log("Integrando middleware do Vite no Express...");
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
