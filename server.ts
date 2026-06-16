@@ -321,7 +321,7 @@ export async function createApp(options: CreateAppOptions = {}) {
 
       try {
         console.log(`[Mercado Pago Real] Iniciando criação de preferência para o pedido ${orderId}...`);
-        const mpResponse = await fetch("https://api.mercadopago.com/v1/checkout/preferences", {
+        const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessTokenMP}`,
