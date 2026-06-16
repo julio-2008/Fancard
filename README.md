@@ -112,7 +112,7 @@
 │ (Designer envia arte tratada)
 ▼
 [ Página de Status de Pedido ] ➜ 💥 [ Liberação para download e envio físico! ]
-code
+código
 Código
 1. **Escolha de Pacotes**: Pacote digital de alta definição ou pacotes físicos com envio diretamente para a residência do comprador.
 2. **Upload & Validação de Foto**: Upload otimizado com feedback instantâneo de tamanho e enquadramento.
@@ -136,16 +136,5 @@ Experimente a emoção de se ter estampado na figurinha épica por valores pensa
 
 Diferente de sistemas meramente estáticos, o **FanCard Brasil** possui um motor full-stack eficiente para evitar falhas de comunicação e garantir transações seguras:
 
-*   **Frontend**: React 19 estruturado com animações exclusivas usando `motion` e estilização premium baseada nas cores da bandeira nacional brasileira com Tailwind CSS.
-*   **Backend (Engine Server)**: API Express robusta responsável por gerenciar credenciais criptografadas, persistir os pedidos gerados e intermediar com precisão as notificações instantâneas de pagamento (IPN/Webhooks) do Mercado Pago sem expor chaves sensíveis ao cliente.
-
----
-
-## ⚙️ Como Executar e Implantar de Graça
-
-A aplicação **precisa** de um ambiente que execute Node.js para que o Painel Admin e o Checkout funcionem. Plataformas clássicas como Netlify (estático simples) ou GitHub Pages não funcionarão de forma completa por falta de servidor ativo.
-
-### 1. Clonando o Repositório
-```bash
-git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
-cd SEU_REPOSITORIO
+*   **Front-end**: React 19 estruturado com animações exclusivas usando `movimento` e estilização premium baseada nas cores da bandeira nacional brasileira com Tailwind CSS.
+*   **Back-end (servidor de mecanismo)**: API Express robusta responsável por gerenciar credenciais criptografadas, persistir os pedidos gerados e intermediar com precisão as notificações instantâneas de pagamento (IPN/Webhooks) do Mercado Pago sem expor chaves sensíveis ao cliente.
