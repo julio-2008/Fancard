@@ -25,7 +25,7 @@ interface FanCardItem {
 
 interface Order {
   id: string;
-  accessToken: string;
+  accessToken?: string;
   createdAt: string;
   packageId: string;
   packageName: string;
@@ -61,6 +61,17 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome }: PedidoSta
   const [copiedOrderId, setCopiedOrderId] = useState<boolean>(false);
   const [simulatingPayment, setSimulatingPayment] = useState<boolean>(false);
   const [notification, setNotification] = useState<{ message: string; type: "success" | "info" } | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const ready = order?.production.status === "ready" || order?.production.status === "delivered";
+    if (order && ready && !order.feedback) {
+      setShowFeedback(true);
+    }
+  }, [order?.id, order?.production.status, order?.feedback]);
 
   // Check query params in location
   const isSimulationParam = window.location.hash.includes("simulate_payment=true") || 
@@ -257,13 +268,6 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome }: PedidoSta
   const isProductionReady = order.production.status === "ready" || order.production.status === "delivered";
   const isProductionStarted = order.production.status === "in_production" || order.production.status === "ready";
   
-  // Feedback check
-  const needsFeedback = isProductionReady && !order.feedback;
-  const [showFeedback, setShowFeedback] = useState(needsFeedback);
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
   return (
     <main className="w-full min-h-screen bg-[#fffdfa] pt-24 pb-20 px-4 sm:px-6 lg:px-8">
       {showFeedback && (

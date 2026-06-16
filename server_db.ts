@@ -1,16 +1,16 @@
 import fs from "fs";
 import path from "path";
+import { BlobNotFoundError, get, put } from "@vercel/blob";
 
-// Define storage paths
-// WARNING: Local filesystem on Cloud Run is ephemeral.
-// TODO: Replace with permanent storage (Google Cloud Firestore + Google Cloud Storage Bucket) in production.
 const DATA_DIR = path.join(process.cwd(), "storage");
 const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 const ORIGINAL_UPLOADS_DIR = path.join(UPLOADS_DIR, "original");
 const FINAL_UPLOADS_DIR = path.join(UPLOADS_DIR, "final");
+const ORDERS_BLOB_PATH = "fancard/database/orders.json";
 
-// Ensure directories exist
+const shouldUseBlob = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+
 function ensureDirs() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -29,7 +29,18 @@ function ensureDirs() {
   }
 }
 
-// Interfaces
+async function streamToText(stream: ReadableStream<Uint8Array>) {
+  const response = new Response(stream);
+  return response.text();
+}
+
+function contentTypeFromFileName(fileName: string) {
+  const ext = path.extname(fileName).toLowerCase();
+  if (ext === ".jpg" || ext === ".jpeg") return "image/jpeg";
+  if (ext === ".webp") return "image/webp";
+  return "image/png";
+}
+
 export interface FanCardItem {
   id: string;
   index: number;
@@ -81,56 +92,84 @@ export interface Order {
     finalFiles: FinalFile[];
     adminNotes?: string;
   };
-  feedback?: { 
-    rating: number; 
-    comment: string; 
-    createdAt: string; 
+  feedback?: {
+    rating: number;
+    comment: string;
+    createdAt: string;
   };
 }
 
-// Setup directories
-ensureDirs();
+export async function loadOrders(): Promise<Order[]> {
+  if (shouldUseBlob()) {
+    try {
+      const result = await get(ORDERS_BLOB_PATH, { access: "private", useCache: false });
+      if (result.statusCode !== 200 || !result.stream) return [];
+      const text = await streamToText(result.stream);
+      return JSON.parse(text || "[]");
+    } catch (err) {
+      if (err instanceof BlobNotFoundError) return [];
+      console.error("Error reading orders from Vercel Blob:", err);
+      return [];
+    }
+  }
 
-// Read all orders
-export function loadOrders(): Order[] {
   try {
     ensureDirs();
     const data = fs.readFileSync(ORDERS_FILE, "utf-8");
     return JSON.parse(data);
   } catch (err) {
-    console.error("Error reading orders:", err);
+    console.error("Error reading local orders:", err);
     return [];
   }
 }
 
-// Write orders to file
-export function saveOrders(orders: Order[]): void {
+export async function saveOrders(orders: Order[]): Promise<void> {
+  if (shouldUseBlob()) {
+    try {
+      await put(ORDERS_BLOB_PATH, JSON.stringify(orders, null, 2), {
+        access: "private",
+        allowOverwrite: true,
+        contentType: "application/json",
+      });
+      return;
+    } catch (err) {
+      console.error("Error writing orders to Vercel Blob:", err);
+      throw err;
+    }
+  }
+
   try {
     ensureDirs();
     fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), "utf-8");
   } catch (err) {
-    console.error("Error writing orders:", err);
+    console.error("Error writing local orders:", err);
+    throw err;
   }
 }
 
-// Help save images from Base64 data
-export function saveBase64Image(
+export async function saveBase64Image(
   base64Data: string,
   type: "original" | "final",
   fileName: string
-): string {
-  ensureDirs();
-  // Strip standard mime-type header if present
+): Promise<string> {
   const base64Prefix = /^data:image\/[a-zA-Z+.-]+;base64,/;
   const cleanBase64 = base64Data.replace(base64Prefix, "");
   const buffer = Buffer.from(cleanBase64, "base64");
+  const safeFileName = fileName.replace(/[^a-zA-Z0-9_.-]/g, "_");
+  const uniqueName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${safeFileName}`;
 
+  if (shouldUseBlob()) {
+    const blob = await put(`fancard/uploads/${type}/${uniqueName}`, buffer, {
+      access: "public",
+      contentType: contentTypeFromFileName(safeFileName),
+      addRandomSuffix: false,
+    });
+    return blob.url;
+  }
+
+  ensureDirs();
   const targetDir = type === "original" ? ORIGINAL_UPLOADS_DIR : FINAL_UPLOADS_DIR;
-  const uniqueName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${fileName}`;
   const filePath = path.join(targetDir, uniqueName);
-
   fs.writeFileSync(filePath, buffer);
-
-  // Return the web-accessible static serving URL
   return `/uploads/${type}/${uniqueName}`;
 }

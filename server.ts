@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import fs from "fs";
 import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
@@ -16,9 +15,13 @@ import { buildFanCardPrompt } from "./src/lib/promptBuilder";
 
 dotenv.config();
 
-async function startServer() {
+type CreateAppOptions = {
+  serveClient?: boolean;
+};
+
+export async function createApp(options: CreateAppOptions = {}) {
+  const serveClient = options.serveClient ?? process.env.NODE_ENV === "production";
   const app = express();
-  const PORT = 3000;
 
   // Increase payload limit for Base64 image uploads during purchase
   app.use(express.json({ limit: "50mb" }));
@@ -38,6 +41,44 @@ async function startServer() {
   const adminSessions = new Map<string, AdminSession>();
   const SESSION_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
 
+  const base64UrlEncode = (value: string) => Buffer.from(value).toString("base64url");
+
+  const getAdminSessionSecret = () => {
+    return process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || "fancard_local_session_secret";
+  };
+
+  const signAdminPayload = (payload: string) => {
+    return crypto.createHmac("sha256", getAdminSessionSecret()).update(payload).digest("base64url");
+  };
+
+  const createAdminToken = () => {
+    const payload = base64UrlEncode(JSON.stringify({
+      exp: Date.now() + SESSION_DURATION_MS,
+      nonce: crypto.randomBytes(12).toString("hex"),
+    }));
+    return `adm_${payload}.${signAdminPayload(payload)}`;
+  };
+
+  const verifyAdminSessionToken = (token: string) => {
+    if (!token.startsWith("adm_")) return false;
+    const [payload, signature] = token.slice(4).split(".");
+    if (!payload || !signature) return false;
+
+    const expectedSignature = signAdminPayload(payload);
+    const received = Buffer.from(signature);
+    const expected = Buffer.from(expectedSignature);
+    if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
+      return false;
+    }
+
+    try {
+      const decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8"));
+      return typeof decoded.exp === "number" && Date.now() <= decoded.exp;
+    } catch {
+      return false;
+    }
+  };
+
   // Helper middleware for Admin Authentication
   const adminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const authHeader = req.headers.authorization;
@@ -47,6 +88,9 @@ async function startServer() {
 
     const token = authHeader.replace("Bearer ", "").trim();
     const session = adminSessions.get(token);
+    if (!session && verifyAdminSessionToken(token)) {
+      return next();
+    }
 
     if (!session) {
       return res.status(401).json({ error: "Sessão inválida ou expirada." });
@@ -87,7 +131,7 @@ async function startServer() {
       return res.status(401).json({ error: "Senha administrativa incorreta." });
     }
 
-    const token = "adm_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const token = createAdminToken();
     const expiresAt = Date.now() + SESSION_DURATION_MS;
     adminSessions.set(token, { token, expiresAt });
 
@@ -113,6 +157,9 @@ async function startServer() {
     if (!authHeader) return res.json({ authenticated: false });
     const token = authHeader.replace("Bearer ", "").trim();
     const session = adminSessions.get(token);
+    if (!session && verifyAdminSessionToken(token)) {
+      return res.json({ authenticated: true });
+    }
     if (!session || Date.now() > session.expiresAt) {
       return res.json({ authenticated: false });
     }
@@ -175,7 +222,7 @@ async function startServer() {
 
         // Save native image file to uploads storage and get static link
         const fileName = `item_${i + 1}.png`;
-        const photoUrl = saveBase64Image(item.photo, "original", fileName);
+        const photoUrl = await saveBase64Image(item.photo, "original", fileName);
 
         // Generate custom instruction prompt
         const promptText = buildFanCardPrompt(item.cardData);
@@ -225,7 +272,7 @@ async function startServer() {
 
       // 4. Mercado Pago Preference Creation Setup
       const accessTokenMP = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
-      const hostUrl = process.env.APP_BASE_URL;
+      const hostUrl = process.env.APP_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
 
       // Validação de configuração obrigatória
       if (!accessTokenMP || !hostUrl || accessTokenMP === "SEU_ACCESS_TOKEN_AQUI" || accessTokenMP.trim() === "") {
@@ -294,9 +341,9 @@ async function startServer() {
         newOrder.payment.checkoutUrl = prefData.init_point;
         newOrder.payment.status = "pending";
 
-        const orders = loadOrders();
+        const orders = await loadOrders();
         orders.push(newOrder);
-        saveOrders(orders);
+        await saveOrders(orders);
 
         return res.json({
           status: "success",
@@ -307,12 +354,18 @@ async function startServer() {
       } catch (mpErr: any) {
         console.warn(`[Mercado Pago] Falha na comunicação com gateway de pagamento (${mpErr?.message || mpErr}). Usando modo simulado de fallback.`);
         
+        if (process.env.NODE_ENV === "production") {
+          return res.status(502).json({
+            error: "Não foi possível gerar o checkout do Mercado Pago agora. Tente novamente em alguns minutos.",
+          });
+        }
+
         newOrder.payment.checkoutUrl = `${cleanHostUrl}/#pedido/${orderId}?token=${accessToken}&payment_status=simulated`;
         newOrder.payment.status = "pending";
 
-        const orders = loadOrders();
+        const orders = await loadOrders();
         orders.push(newOrder);
-        saveOrders(orders);
+        await saveOrders(orders);
 
         return res.json({
           status: "success",
@@ -352,7 +405,7 @@ async function startServer() {
   // ==================== PUBLIC ENDPOINT: RETRIEVE SINGLE ORDER STATUS ====================
 
   // GET /api/orders/public/:publicOrderId
-  app.get("/api/orders/public/:publicOrderId", (req, res) => {
+  app.get("/api/orders/public/:publicOrderId", async (req, res) => {
     const { publicOrderId } = req.params;
     const { token } = req.query;
 
@@ -360,7 +413,7 @@ async function startServer() {
       return res.status(401).json({ error: "Token de acesso obrigatório ausente." });
     }
 
-    const orders = loadOrders();
+    const orders = await loadOrders();
     const order = orders.find((o) => o.id === publicOrderId);
 
     if (!order) {
@@ -372,11 +425,64 @@ async function startServer() {
       return res.status(401).json({ error: "Acesso não autorizado para visualizar o pedido." });
     }
 
-    // Return the safe order data to the client status tracking page
-    return res.json(order);
+    const safeOrder = {
+      id: order.id,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      packageId: order.packageId,
+      packageName: order.packageName,
+      quantity: order.quantity,
+      price: order.price,
+      buyer: order.buyer,
+      items: order.items.map((item) => ({
+        id: item.id,
+        index: item.index,
+        photoUrl: item.photoUrl,
+        originalPhotoName: item.originalPhotoName,
+        cardData: item.cardData,
+      })),
+      payment: {
+        provider: order.payment.provider,
+        status: order.payment.status,
+        checkoutUrl: order.payment.checkoutUrl,
+      },
+      production: {
+        status: order.production.status,
+        finalFiles: order.production.finalFiles,
+      },
+      feedback: order.feedback,
+    };
+
+    return res.json(safeOrder);
   });
 
   // ==================== MERCADO PAGO WEBHOOK ====================
+
+  const parseMercadoPagoSignature = (signatureHeader: string) => {
+    return signatureHeader.split(",").reduce<Record<string, string>>((acc, part) => {
+      const [key, value] = part.split("=");
+      if (key && value) acc[key.trim()] = value.trim();
+      return acc;
+    }, {});
+  };
+
+  const isValidMercadoPagoSignature = (
+    signatureHeader: string,
+    requestId: string,
+    paymentId: string,
+    secret: string
+  ) => {
+    const signatureParts = parseMercadoPagoSignature(signatureHeader);
+    const ts = signatureParts.ts;
+    const receivedHash = signatureParts.v1;
+    if (!ts || !receivedHash) return false;
+
+    const manifest = `id:${paymentId};request-id:${requestId};ts:${ts};`;
+    const expectedHash = crypto.createHmac("sha256", secret).update(manifest).digest("hex");
+    const received = Buffer.from(receivedHash);
+    const expected = Buffer.from(expectedHash);
+    return received.length === expected.length && crypto.timingSafeEqual(received, expected);
+  };
 
   // POST /api/mercadopago/webhook (with GET support for verification)
   app.all("/api/mercadopago/webhook", async (req, res) => {
@@ -397,10 +503,8 @@ async function startServer() {
 
       if (secret && sig && requestId) {
         const data = req.body;
-        const paymentId = data.data?.id || data.id;
-        const message = `id:${paymentId};request-id:${requestId};`;
-        const hmac = crypto.createHmac("sha256", secret).update(message).digest("hex");
-        if (sig !== hmac) {
+        const paymentId = String(data.data?.id || data.id || req.query.id || "");
+        if (!paymentId || !isValidMercadoPagoSignature(sig, requestId, paymentId, secret)) {
           console.warn("[Webhook] Assinatura inválida.");
           return res.sendStatus(403);
         }
@@ -434,7 +538,7 @@ async function startServer() {
         const mpStatus = paymentInfo.status; // approved, pending, rejected etc
 
         if (orderId) {
-          const orders = loadOrders();
+          const orders = await loadOrders();
           const orderIdx = orders.findIndex((o) => o.id === orderId);
 
           if (orderIdx !== -1) {
@@ -450,7 +554,7 @@ async function startServer() {
             }
 
             orders[orderIdx] = order;
-            saveOrders(orders);
+            await saveOrders(orders);
           } else {
             console.warn(`Webhook: Pedido correspondente ${orderId} não encontrado no sistema.`);
           }
@@ -467,9 +571,9 @@ async function startServer() {
   // ==================== SIMULATION ROUTE: INSTANT LOCAL PAYMENT FOR TESTING ====================
   // APENAS PARA DESENVOLVIMENTO
   if (process.env.NODE_ENV !== 'production') {
-    app.post("/api/admin/simulate-pay/:id", (req, res) => {
+    app.post("/api/admin/simulate-pay/:id", async (req, res) => {
       const { id } = req.params;
-      const orders = loadOrders();
+      const orders = await loadOrders();
       const idx = orders.findIndex((o) => o.id === id);
 
       if (idx === -1) {
@@ -482,7 +586,7 @@ async function startServer() {
       order.updatedAt = new Date().toISOString();
 
       orders[idx] = order;
-      saveOrders(orders);
+      await saveOrders(orders);
 
       console.log(`[Simulação] Pagamento do pedido ${id} aprovado via rota interna sandbox.`);
       return res.json({ status: "success", message: `Pedido ${id} simulado com sucesso.`, order });
@@ -491,7 +595,7 @@ async function startServer() {
 
   // ==================== ENDPOINT: SUBMIT FEEDBACK ====================
 
-  app.post("/api/orders/:orderId/feedback", (req, res) => {
+  app.post("/api/orders/:orderId/feedback", async (req, res) => {
     const { orderId } = req.params;
     const { rating, comment } = req.body;
     
@@ -499,7 +603,7 @@ async function startServer() {
       return res.status(400).json({ error: "Avaliação incompleta ou comentário muito curto." });
     }
 
-    const orders = loadOrders();
+    const orders = await loadOrders();
     const idx = orders.findIndex((o) => o.id === orderId);
 
     if (idx === -1) {
@@ -512,21 +616,21 @@ async function startServer() {
       createdAt: new Date().toISOString()
     };
     
-    saveOrders(orders);
+    await saveOrders(orders);
     return res.json({ status: "success" });
   });
 
 
   // GET /api/admin/orders - list all orders
-  app.get("/api/admin/orders", adminAuth, (req, res) => {
-    const orders = loadOrders();
+  app.get("/api/admin/orders", adminAuth, async (req, res) => {
+    const orders = await loadOrders();
     return res.json(orders);
   });
 
   // GET /api/admin/orders/:id - detail specific order
-  app.get("/api/admin/orders/:id", adminAuth, (req, res) => {
+  app.get("/api/admin/orders/:id", adminAuth, async (req, res) => {
     const { id } = req.params;
-    const orders = loadOrders();
+    const orders = await loadOrders();
     const order = orders.find((o) => o.id === id);
     if (!order) {
       return res.status(404).json({ error: "Pedido não encontrado." });
@@ -535,11 +639,11 @@ async function startServer() {
   });
 
   // PATCH /api/admin/orders/:id - edit / update cardData or status
-  app.patch("/api/admin/orders/:id", adminAuth, (req, res) => {
+  app.patch("/api/admin/orders/:id", adminAuth, async (req, res) => {
     const { id } = req.params;
     const updatePayload = req.body;
 
-    const orders = loadOrders();
+    const orders = await loadOrders();
     const idx = orders.findIndex((o) => o.id === id);
 
     if (idx === -1) {
@@ -578,14 +682,14 @@ async function startServer() {
 
     order.updatedAt = new Date().toISOString();
     orders[idx] = order;
-    saveOrders(orders);
+    await saveOrders(orders);
 
     console.log(`[Admin] Pedido ${id} editado com sucesso.`);
     return res.json({ status: "success", order });
   });
 
   // POST /api/admin/orders/:id/final-files - upload generated FanCard for an item
-  app.post("/api/admin/orders/:id/final-files", adminAuth, (req, res) => {
+  app.post("/api/admin/orders/:id/final-files", adminAuth, async (req, res) => {
     const { id } = req.params;
     const { itemId, fileBase64, fileName } = req.body;
 
@@ -593,7 +697,7 @@ async function startServer() {
       return res.status(400).json({ error: "Campos obrigatórios ausentes: itemId, fileBase64, fileName." });
     }
 
-    const orders = loadOrders();
+    const orders = await loadOrders();
     const orderIdx = orders.findIndex((o) => o.id === id);
 
     if (orderIdx === -1) {
@@ -609,7 +713,7 @@ async function startServer() {
     }
 
     // Save final uploaded asset
-    const savedUrl = saveBase64Image(fileBase64, "final", fileName);
+    const savedUrl = await saveBase64Image(fileBase64, "final", fileName);
 
     const newFinalFile: FinalFile = {
       id: "final_" + Math.random().toString(36).substring(2, 9),
@@ -635,13 +739,17 @@ async function startServer() {
 
     order.updatedAt = new Date().toISOString();
     orders[orderIdx] = order;
-    saveOrders(orders);
+    await saveOrders(orders);
 
     console.log(`[Admin] Figurinhas finalizada adicionada para o item ${itemId} do pedido ${id}.`);
     return res.json({ status: "success", order });
   });
 
   // ==================== CLIENT VITE INTEGRATION BIND ====================
+
+  if (!serveClient) {
+    return app;
+  }
 
   if (process.env.NODE_ENV !== "production") {
     console.log("Integrando middleware do Vite no Express...");
@@ -659,9 +767,17 @@ async function startServer() {
     });
   }
 
+  return app;
+}
+
+async function startServer() {
+  const app = await createApp({ serveClient: true });
+  const PORT = Number(process.env.PORT || 3000);
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`[FanCard Brasil] Servidor ativo na porta ${PORT}`);
   });
 }
 
-startServer();
+if (process.env.VERCEL !== "1") {
+  startServer();
+}
