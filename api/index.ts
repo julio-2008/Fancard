@@ -1,1 +1,1 @@
-export { default } from "./serverless";
+export { default } from "./serverless.js";

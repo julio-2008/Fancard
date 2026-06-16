@@ -10,8 +10,8 @@ import {
   Order,
   FanCardItem,
   FinalFile,
-} from "./server_db";
-import { buildFanCardPrompt } from "./src/lib/promptBuilder";
+} from "./server_db.js";
+import { buildFanCardPrompt } from "./src/lib/promptBuilder.js";
 
 dotenv.config();
 
