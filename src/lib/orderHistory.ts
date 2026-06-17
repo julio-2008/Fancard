@@ -24,6 +24,15 @@ export function readOrderHistory(): StoredOrderHistoryItem[] {
   }
 }
 
+export function readLastOrder(): StoredOrderHistoryItem | null {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(LAST_ORDER_KEY) || "null");
+    return parsed?.orderId && parsed?.accessToken ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 export function saveOrderHistoryItem(item: StoredOrderHistoryItem) {
   const current = readOrderHistory();
   const nextItem = {

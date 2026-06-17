@@ -422,6 +422,45 @@ export async function createApp(options: CreateAppOptions = {}) {
 
   // ==================== PUBLIC ENDPOINT: RETRIEVE SINGLE ORDER STATUS ====================
 
+  // GET /api/orders/lookup-by-email?email=cliente@email.com
+  app.get("/api/orders/lookup-by-email", async (req, res) => {
+    const email = String(req.query.email || "").trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Email invalido para buscar pedidos." });
+    }
+
+    const orders = await loadOrders();
+    const matched = orders
+      .filter((order) => order.buyer.email.toLowerCase() === email)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 20)
+      .map((order) => ({
+        id: order.id,
+        accessToken: order.accessToken,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        packageId: order.packageId,
+        packageName: order.packageName,
+        quantity: order.quantity,
+        price: order.price,
+        buyer: {
+          name: order.buyer.name,
+          email: order.buyer.email,
+        },
+        payment: {
+          provider: order.payment.provider,
+          status: order.payment.status,
+          checkoutUrl: order.payment.checkoutUrl,
+        },
+        production: {
+          status: order.production.status,
+          finalFiles: order.production.finalFiles.map((file) => ({ id: file.id })),
+        },
+      }));
+
+    return res.json({ orders: matched });
+  });
+
   // GET /api/orders/public/:publicOrderId
   app.get("/api/orders/public/:publicOrderId", async (req, res) => {
     const { publicOrderId } = req.params;

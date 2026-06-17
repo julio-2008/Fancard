@@ -48,6 +48,12 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
 }) => {
   // Estado local gerenciado em React
   const [orderState, setOrderState] = useState<OrderState>(() => {
+    let savedProfile: { name?: string; email?: string } = {};
+    try {
+      savedProfile = JSON.parse(localStorage.getItem("fancardCustomerProfile") || "{}");
+    } catch {
+      savedProfile = {};
+    }
     const qty = initialPackageId ? (packageMap[initialPackageId]?.quantity || 1) : 1;
     const defaultItems = Array.from({ length: qty }, (_, i) => ({
       id: `figurinha_${i}`,
@@ -95,9 +101,9 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
         },
       },
       deliveryData: {
-        buyerName: "",
-        buyerEmail: "",
-        confirmEmail: "",
+        buyerName: savedProfile.name || "",
+        buyerEmail: savedProfile.email || "",
+        confirmEmail: savedProfile.email || "",
         phone: "",
       },
       activeStep: initialPackageId ? "photo" : "package",
@@ -522,7 +528,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
   // 4. Cadastro de dados de entrega
   const handleSaveDelivery = (e: React.FormEvent) => {
     e.preventDefault();
-    const { buyerName, buyerEmail, confirmEmail } = orderState.deliveryData;
+    const { buyerName, buyerEmail } = orderState.deliveryData;
     if (!buyerName.trim()) {
       showToast("Informe o nome completo do comprador.");
       return;
@@ -532,10 +538,23 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
       showToast("Insira um endereço de e-mail válido para a entrega digital.");
       return;
     }
-    if (buyerEmail !== confirmEmail) {
+    if (false) {
       showToast("A confirmação do e-mail não coincide. Verifique as caixas.");
       return;
     }
+    localStorage.setItem("fancardCustomerProfile", JSON.stringify({
+      name: buyerName.trim(),
+      email: buyerEmail.trim().toLowerCase(),
+    }));
+    saveState({
+      ...orderState,
+      deliveryData: {
+        ...orderState.deliveryData,
+        buyerName: buyerName.trim(),
+        buyerEmail: buyerEmail.trim().toLowerCase(),
+        confirmEmail: buyerEmail.trim().toLowerCase(),
+      },
+    });
     markStepDone("delivery", "summary");
   };
 
@@ -1537,7 +1556,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                         </div>
 
                         {/* Telefone opcional */}
-                        <div>
+                        <div className="hidden">
                           <label htmlFor="buyerPhone" className="block text-xs font-black text-green-deep uppercase tracking-wider mb-2">
                             Telefone opcional com DDD
                           </label>
@@ -1586,7 +1605,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                         </div>
 
                         {/* Confirmar E-mail */}
-                        <div>
+                        <div className="hidden">
                           <label htmlFor="confirmEmail" className="block text-xs font-black text-green-deep uppercase tracking-wider mb-2">
                             Confirme seu E-mail
                           </label>
