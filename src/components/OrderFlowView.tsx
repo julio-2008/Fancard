@@ -1727,7 +1727,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                     Tudo conferido e pronto para entrar em campo.
                   </h2>
                   <p className="text-muted-text mt-2 font-medium">
-                    Abaixo está a súmula final do seu pedido. Após a confirmação, o Pix conectará seus dados com segurança.
+                    Abaixo está a súmula final do seu pedido. Após a confirmação, o pagamento conectará seus dados com segurança.
                   </p>
 
                   <div className="mt-8 space-y-4 max-w-3xl">

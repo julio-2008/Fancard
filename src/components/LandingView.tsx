@@ -228,10 +228,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 Sua foto na figurinha da Copa ainda hoje.
               </h1>
               <p className="mt-5 max-w-2xl text-white/88 text-base md:text-xl leading-relaxed font-bold">
-                Entre na Convocacao Relampago: envie sua foto, pague no Pix e receba uma FanCard digital personalizada em ate 1 hora.
+                Entre na Convocacao Relampago: envie sua foto, pague com seguranca e receba uma FanCard digital personalizada em ate 1 hora.
               </p>
 
-              <div className="mt-5 grid grid-cols-3 gap-2 max-w-lg">
+              <div className="mt-4 grid grid-cols-3 gap-1.5 max-w-sm">
                 {[
                   ["1h", "Individual"],
                   ["2h", "Trio/Familia"],
@@ -239,12 +239,12 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 ].map(([value, label], index) => (
                   <motion.div
                     key={label}
-                    className="rounded-xl border-2 border-[#ffcc00] bg-[#061f12] px-2.5 py-2 shadow-xl"
-                    animate={{ y: [0, -4, 0], scale: [1, 1.03, 1] }}
+                    className="rounded-lg border border-[#ffcc00] bg-[#061f12] px-2 py-1.5 shadow-lg"
+                    animate={{ y: [0, -3, 0], scale: [1, 1.02, 1] }}
                     transition={{ duration: 1.35 + index * 0.18, repeat: Infinity, ease: "easeInOut" }}
                   >
-                    <p className="text-[#ffcc00] text-lg md:text-2xl font-black leading-none">{value}</p>
-                    <p className="text-white/75 text-[10px] md:text-xs font-bold uppercase mt-1">{label}</p>
+                    <p className="text-[#ffcc00] text-base md:text-xl font-black leading-none">{value}</p>
+                    <p className="text-white/75 text-[8px] md:text-[10px] font-bold uppercase mt-1 leading-tight">{label}</p>
                   </motion.div>
                 ))}
               </div>
@@ -330,7 +330,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-0 border-y-2 border-[#103c27] bg-[#ffcc00]">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               [ImageIcon, "Foto enviada", "voce sobe a imagem com rosto visivel"],
               [Sparkles, "Recorte limpo", "a arte recebe tratamento e encaixe"],
@@ -339,19 +339,19 @@ export const LandingView: React.FC<LandingViewProps> = ({
             ].map(([Icon, title, text], index) => (
               <motion.article
                 key={String(title)}
-                className="relative p-4 md:p-5 border-b-2 md:border-b-0 md:border-r-2 last:border-r-0 border-[#103c27]"
+                className="relative rounded-xl bg-white p-3.5 md:p-4 border-2 border-[#103c27] shadow-[0_4px_0_#103c27]"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.45, delay: index * 0.08 }}
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-full bg-[#103c27] text-[#ffcc00] flex items-center justify-center">
-                    {React.createElement(Icon as typeof ImageIcon, { className: "w-5 h-5" })}
+                  <span className="w-8 h-8 rounded-lg bg-[#103c27] text-[#ffcc00] flex items-center justify-center">
+                    {React.createElement(Icon as typeof ImageIcon, { className: "w-4 h-4" })}
                   </span>
                   <span className="mono text-[10px] text-[#103c27] font-black">0{index + 1}</span>
                 </div>
-                <h3 className="mt-4 text-base md:text-lg font-black text-[#103c27]">{title as string}</h3>
+                <h3 className="mt-3 text-base md:text-lg font-black text-[#103c27]">{title as string}</h3>
                 <p className="mt-1.5 text-xs md:text-sm font-bold text-[#103c27]/75">{text as string}</p>
               </motion.article>
             ))}
@@ -381,18 +381,16 @@ export const LandingView: React.FC<LandingViewProps> = ({
               }`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              animate={card.featured ? { y: [0, -8, 0], rotate: [0, -0.4, 0.4, 0] } : undefined}
+              animate={card.featured ? { y: [0, -7, 0], rotate: [0, -0.35, 0.35, 0] } : { y: [0, -2, 0] }}
               viewport={{ once: true, margin: "-80px" }}
-              transition={card.featured ? { duration: 1.65, repeat: Infinity, ease: "easeInOut" } : { duration: 0.45 }}
+              transition={card.featured ? { duration: 1.7, repeat: Infinity, ease: "easeInOut" } : { duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
             >
               {card.featured && (
-                <motion.div
+                <div
                   className="absolute -top-4 left-5 right-5 rounded-full bg-[#ffcc00] text-[#2a0606] border-2 border-[#2a0606] px-3 py-1.5 text-center text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-xl"
-                  animate={{ scale: [1, 1.06, 1], backgroundColor: ["#ffcc00", "#ffef6a", "#ffcc00"] }}
-                  transition={{ duration: 0.85, repeat: Infinity, ease: "easeInOut" }}
                 >
                   Recomendado - 51% OFF
-                </motion.div>
+                </div>
               )}
               <span className={`w-max rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider ${
                 card.featured ? "mt-3 bg-[#ffcc00] text-green-deep" : "bg-[#ecf4ee] text-green-primary"
@@ -444,7 +442,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
             {[
               ["1", "Escolha o pacote", "Familia, Trio ou Individual."],
               ["2", "Envie foto e dados", "Nome, email uma vez, cidade/UF e medidas do card."],
-              ["3", "Pague no Pix", "Checkout seguro do Mercado Pago."],
+              ["3", "Pagamento seguro", "Checkout seguro do Mercado Pago."],
               ["4", "Baixe quando liberar", "A arte aparece na Minha Arquibancada e no pedido."],
             ].map(([number, title, text], index) => (
               <article key={number} className="relative flex gap-5 pb-7 last:pb-0">

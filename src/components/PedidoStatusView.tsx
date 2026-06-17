@@ -585,7 +585,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
               </h3>
               <p className="text-xs text-muted-text mt-1 max-w-xl">
                 {!isPaid 
-                  ? `Assim que o pix ou cartao for confirmado no Mercado Pago, sua arte entra na Convocacao Relampago. A estimativa desta rodada e de ${productionDeadline}.` 
+                  ? `Assim que o pagamento for confirmado no Mercado Pago, sua arte entra na Convocacao Relampago. A estimativa desta rodada e de ${productionDeadline}.` 
                   : !isProductionReady 
                     ? `Nossa equipe cuida da remocao de fundo, tratamento de iluminacao e harmonia de cores para deixar seu card pronto. Tempo estimado nesta rodada: ${productionDeadline}.` 
                     : "Sua arte digital concluÃ­da foi qualificada e liberada com design profissional de alta fidelidade. FaÃ§a o seu download em excelente definiÃ§Ã£o abaixo."}
