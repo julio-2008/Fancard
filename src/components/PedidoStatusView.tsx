@@ -57,9 +57,10 @@ interface PedidoStatusViewProps {
   orderId: string;
   accessToken: string;
   onBackHome: () => void;
+  onOpenArquibancada?: () => void;
 }
 
-export function PedidoStatusView({ orderId, accessToken, onBackHome }: PedidoStatusViewProps) {
+export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArquibancada }: PedidoStatusViewProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorCode, setErrorCode] = useState<string | null>(null);
@@ -331,12 +332,22 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome }: PedidoSta
             ? "O token de acesso fornecido para este link é inválido. Certifique-se de que copiou o endereço do pedido corretamente."
             : "Não conseguimos localizar nenhuma chave correspondente a essa identificação em nosso banco de dados."}
         </p>
-        <button
-          onClick={onBackHome}
-          className="inline-flex items-center gap-2 bg-green-primary text-white px-6 py-3 rounded-full font-bold shadow-md hover:bg-green-deep transition-all cursor-pointer text-sm"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar ao Início
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {onOpenArquibancada && (
+            <button
+              onClick={onOpenArquibancada}
+              className="inline-flex items-center justify-center gap-2 bg-yellow-primary text-green-deep px-6 py-3 rounded-full font-black shadow-md hover:bg-white transition-all cursor-pointer text-sm"
+            >
+              Entrar com email na Arquibancada
+            </button>
+          )}
+          <button
+            onClick={onBackHome}
+            className="inline-flex items-center justify-center gap-2 bg-green-primary text-white px-6 py-3 rounded-full font-bold shadow-md hover:bg-green-deep transition-all cursor-pointer text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" /> Voltar ao Início
+          </button>
+        </div>
       </div>
     );
   }

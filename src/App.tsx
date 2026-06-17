@@ -26,7 +26,13 @@ export default function App() {
       const queryOrderId = query.get("pedido") || query.get("orderId") || query.get("external_reference");
       const queryToken = query.get("token") || "";
 
-      if (queryOrderId && queryToken) {
+      if (hash === "#arquibancada") {
+        setOrderId("");
+        setOrderToken("");
+        setViewMode("arquibancada");
+      } else if (hash === "#criar") {
+        setViewMode("order");
+      } else if (queryOrderId && queryToken) {
         saveOrderHistoryItem({
           orderId: queryOrderId,
           accessToken: queryToken,
@@ -35,10 +41,6 @@ export default function App() {
         setOrderId(queryOrderId);
         setOrderToken(queryToken);
         setViewMode("pedido");
-      } else if (hash === "#criar") {
-        setViewMode("order");
-      } else if (hash === "#arquibancada") {
-        setViewMode("arquibancada");
       } else if (hash.startsWith("#pedido/") || hash.startsWith("#/pedido/")) {
         // Formato esperado: #pedido/FC123456?token=tok_xxxxx ou #/pedido/FC123456?token=tok_xxxxx
         const rawPath = hash.startsWith("#/pedido/") 
@@ -85,7 +87,7 @@ export default function App() {
       packagesRef.current.scrollIntoView({ behavior: "smooth" });
     } else {
       setViewMode("landing");
-      window.location.hash = "#home";
+      window.history.pushState(null, "", `${window.location.pathname}#home`);
       setTimeout(() => {
         packagesRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
@@ -101,18 +103,22 @@ export default function App() {
       setSelectedPackageId(null);
     }
     setViewMode("order");
-    window.location.hash = "#criar";
+    window.history.pushState(null, "", `${window.location.pathname}#criar`);
   };
 
   // Retornar da chave à homepage
   const goBackToHome = () => {
     setViewMode("landing");
-    window.location.hash = "#home";
+    setOrderId("");
+    setOrderToken("");
+    window.history.pushState(null, "", `${window.location.pathname}#home`);
   };
 
   const openArquibancada = () => {
+    setOrderId("");
+    setOrderToken("");
     setViewMode("arquibancada");
-    window.location.hash = "#arquibancada";
+    window.history.pushState(null, "", `${window.location.pathname}#arquibancada`);
   };
 
   const openSavedOrder = (id: string, token: string) => {
@@ -158,6 +164,7 @@ export default function App() {
             orderId={orderId}
             accessToken={orderToken}
             onBackHome={goBackToHome}
+            onOpenArquibancada={openArquibancada}
           />
         )}
 
