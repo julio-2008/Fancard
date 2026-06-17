@@ -52,26 +52,26 @@ const packageCards: Array<{
 }> = [
   {
     id: "familia",
-    title: "Escalacao Completa",
-    subtitle: "5 FanCards para familia, amigos ou grupo",
+    title: "Escalação Completa",
+    subtitle: "5 FanCards para família, amigos ou grupo",
     oldPrice: "R$ 74,50",
     price: "R$ 35,97",
     unit: "R$ 7,19 cada",
-    deadline: "ate 2 horas",
-    badge: "RECOMENDADO - 51% OFF",
+    deadline: "até 2 horas",
+    badge: "MAIOR ECONOMIA POR ARTE",
     featured: true,
-    note: "O pacote que mais combina com torcida: todo mundo vira figurinha e o preco por arte cai forte.",
+    note: "O pacote que mais combina com torcida: todo mundo vira figurinha e o preço por arte cai forte.",
   },
   {
     id: "trio",
-    title: "Trio Tatico",
-    subtitle: "3 FanCards para casal, irmaos ou amigos",
+    title: "Trio Tático",
+    subtitle: "3 FanCards para casal, irmãos ou amigos",
     oldPrice: "R$ 44,70",
     price: "R$ 26,97",
     unit: "R$ 8,99 cada",
-    deadline: "ate 2 horas",
+    deadline: "até 2 horas",
     badge: "quase 40% OFF",
-    note: "A escolha certa para nao deixar ninguem de fora e ainda pagar menos por arte.",
+    note: "A escolha certa para não deixar ninguém de fora e ainda pagar menos por arte.",
   },
   {
     id: "individual",
@@ -80,8 +80,8 @@ const packageCards: Array<{
     oldPrice: "",
     price: "R$ 14,90",
     unit: "entrada mais barata",
-    deadline: "ate 1 hora",
-    badge: "mais rapido",
+    deadline: "até 1 hora",
+    badge: "mais rápido",
     note: "Perfeito para testar agora e receber uma arte sua pronta para postar ou imprimir.",
   },
 ];
@@ -172,7 +172,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
   const remainingCopy = useMemo(() => {
     if (!offer.isOpen) return "rodada de hoje encerrada";
-    return `${offer.remaining} de ${offer.limit} vagas relampago hoje`;
+    return `${offer.remaining} de ${offer.limit} vagas relâmpago hoje`;
   }, [offer]);
 
   const startPackage = (packageId?: PackageId) => {
@@ -182,7 +182,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
   return (
     <div className="w-full bg-[#fffdf7] pb-24 md:pb-0">
-      <div className="fixed inset-x-0 bottom-0 z-[70] md:top-0 md:bottom-auto bg-[#061f12] text-white border-y border-[#ffcc00] shadow-2xl">
+      <div className="fixed inset-x-0 bottom-0 z-[70] bg-[#061f12] text-white border-y border-[#ffcc00] shadow-2xl md:inset-x-auto md:right-4 md:bottom-4 md:w-[460px] md:rounded-2xl md:border">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-3">
           <div className="min-w-0 flex items-center gap-2">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#ffcc00] text-green-deep shrink-0 animate-pulse">
@@ -190,7 +190,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
             </span>
             <div className="min-w-0">
               <p className="text-[9px] md:text-xs font-black uppercase tracking-wider text-[#ffcc00] leading-none">
-                Convocacao Relampago
+                Convocação Relâmpago
               </p>
               <p className="text-[10px] md:text-sm font-extrabold truncate">
                 {remainingCopy} - encerra as {offer.cutoffLabel}
@@ -211,7 +211,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <img
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none brightness-[0.42]"
           src="/assets/fundo-estadio.jpg"
-          alt="Estadio de futebol em dia de decisao"
+          alt="Estádio de futebol em dia de decisão"
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-[#062013]/70 to-[#061f12]" />
@@ -221,27 +221,27 @@ export const LandingView: React.FC<LandingViewProps> = ({
             <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }}>
               <div className="inline-flex items-center gap-2 rounded-full bg-[#ffcc00] text-green-deep px-3.5 py-1.5 font-black text-[9px] sm:text-[10px] uppercase tracking-widest shadow-xl">
                 <BellRing className="w-4 h-4" />
-                Escalacao de hoje aberta
+                Escalação de hoje aberta
               </div>
 
               <h1 className="display mt-6 max-w-4xl text-4xl sm:text-5xl md:text-7xl text-white leading-[0.95]">
                 Sua foto na figurinha da Copa ainda hoje.
               </h1>
               <p className="mt-5 max-w-2xl text-white/88 text-base md:text-xl leading-relaxed font-bold">
-                Entre na Convocacao Relampago: envie sua foto, pague com seguranca e receba uma FanCard digital personalizada em ate 1 hora.
+                Entre na Convocação Relâmpago: envie sua foto, pague com segurança e receba uma FanCard digital personalizada em até 1 hora.
               </p>
 
               <div className="mt-4 grid grid-cols-3 gap-1.5 max-w-sm">
                 {[
                   ["1h", "Individual"],
-                  ["2h", "Trio/Familia"],
+                  ["2h", "Trio/Família"],
                   [offer.cutoffLabel, "fecha hoje"],
                 ].map(([value, label], index) => (
                   <motion.div
                     key={label}
                     className="rounded-lg border border-[#ffcc00] bg-[#061f12] px-2 py-1.5 shadow-lg"
-                    animate={{ y: [0, -3, 0], scale: [1, 1.02, 1] }}
-                    transition={{ duration: 1.35 + index * 0.18, repeat: Infinity, ease: "easeInOut" }}
+                    animate={{ x: [-2, 2, -2], y: [0, -2, 0] }}
+                    transition={{ duration: 2.4 + index * 0.25, repeat: Infinity, ease: "easeInOut" }}
                   >
                     <p className="text-[#ffcc00] text-base md:text-xl font-black leading-none">{value}</p>
                     <p className="text-white/75 text-[8px] md:text-[10px] font-bold uppercase mt-1 leading-tight">{label}</p>
@@ -255,13 +255,13 @@ export const LandingView: React.FC<LandingViewProps> = ({
                   onClick={() => startPackage("familia")}
                   className="inline-flex items-center justify-center gap-3 bg-[#ffcc00] text-green-deep px-6 sm:px-8 py-3.5 rounded-full font-black hover:bg-white hover:-translate-y-0.5 active:translate-y-0 transition shadow-2xl text-sm sm:text-base"
                 >
-                  PEGAR VAGA RELAMPAGO
+                  PEGAR VAGA RELÂMPAGO
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
 
               <p className="mt-4 text-white/70 text-xs md:text-sm font-semibold">
-                Sem enrolacao de dia util: a rodada vale todos os dias ate {offer.cutoffLabel}, enquanto tiver vaga.
+                Sem enrolação de dia útil: a rodada vale todos os dias até {offer.cutoffLabel}, enquanto tiver vaga.
               </p>
             </motion.div>
 
@@ -303,9 +303,9 @@ export const LandingView: React.FC<LandingViewProps> = ({
       <section className="border-b border-line-border bg-white py-8">
         <div className="max-w-7xl mx-auto px-5 md:px-8 grid md:grid-cols-3 gap-4">
           {[
-            [ShieldCheck, "Foto conferida", "A arte so entra em producao com foto onde o rosto aparece bem."],
+            [ShieldCheck, "Foto conferida", "A arte só entra em produção com foto onde o rosto aparece bem."],
             [Clock, "Acompanhamento vivo", "O pedido fica salvo na Minha Arquibancada e atualiza sozinho."],
-            [Mail, "Entrega no proprio site", "Quando ficar pronto, o download aparece no link do pedido."],
+            [Mail, "Entrega no próprio site", "Quando ficar pronto, o download aparece no link do pedido."],
           ].map(([Icon, title, text]) => (
             <article key={String(title)} className="rounded-2xl border border-line-border bg-[#fff9e9] p-5">
               {React.createElement(Icon as typeof ShieldCheck, { className: "w-6 h-6 text-green-primary mb-3" })}
@@ -326,13 +326,13 @@ export const LandingView: React.FC<LandingViewProps> = ({
               </h2>
             </div>
             <p className="max-w-md text-[#103c27]/75 text-sm md:text-base font-bold">
-              Sem texto infinito: o processo e curto, visual e facil de acompanhar ate a arte final ser liberada.
+              Sem texto infinito: o processo é curto, visual e fácil de acompanhar até a arte final ser liberada.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              [ImageIcon, "Foto enviada", "voce sobe a imagem com rosto visivel"],
+              [ImageIcon, "Foto enviada", "você sobe a imagem com rosto visível"],
               [Sparkles, "Recorte limpo", "a arte recebe tratamento e encaixe"],
               [Trophy, "Dados no card", "nome, cidade/UF e estilo entram no layout"],
               [Check, "Download pronto", "o arquivo aparece no seu pedido"],
@@ -363,10 +363,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <div className="text-center max-w-3xl mx-auto mb-12">
           <p className="mono text-[10px] text-green-primary font-black uppercase">Vaga de craque</p>
           <h2 className="display text-4xl md:text-6xl text-[#103c27] mt-2">
-            Monte sua escalacao antes da rodada fechar.
+            Monte sua escalação antes da rodada fechar.
           </h2>
           <p className="mt-4 text-[#65756b] text-base md:text-lg leading-relaxed font-bold">
-            FanCard funciona melhor quando vira brincadeira de grupo: familia, amigos, casal, pelada e torcida entrando junto na onda.
+            FanCard funciona melhor quando vira brincadeira de grupo: família, amigos, casal, pelada e torcida entrando junto na onda.
           </p>
         </div>
 
@@ -379,18 +379,21 @@ export const LandingView: React.FC<LandingViewProps> = ({
                   ? "bg-[#072816] text-white border-[#ffcc00] md:scale-[1.03]"
                   : "bg-white text-[#103c27] border-line-border"
               }`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              animate={card.featured ? { y: [0, -7, 0], rotate: [0, -0.35, 0.35, 0] } : { y: [0, -2, 0] }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={card.featured ? { duration: 1.7, repeat: Infinity, ease: "easeInOut" } : { duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+              animate={card.featured
+                ? { x: [-3, 3, -3], y: [0, -6, 0], rotate: [-0.3, 0.3, -0.3] }
+                : { x: [-2, 2, -2], y: [0, -2, 0] }}
+              transition={card.featured
+                ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
             >
               {card.featured && (
-                <div
+                <motion.div
                   className="absolute -top-4 left-5 right-5 rounded-full bg-[#ffcc00] text-[#2a0606] border-2 border-[#2a0606] px-3 py-1.5 text-center text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-xl"
+                  animate={{ scale: [1, 1.045, 1], boxShadow: ["0 8px 20px rgba(0,0,0,.18)", "0 8px 26px rgba(255,204,0,.65)", "0 8px 20px rgba(0,0,0,.18)"] }}
+                  transition={{ duration: 1.15, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  Recomendado - 51% OFF
-                </div>
+                  Recomendado · 51% OFF
+                </motion.div>
               )}
               <span className={`w-max rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider ${
                 card.featured ? "mt-3 bg-[#ffcc00] text-green-deep" : "bg-[#ecf4ee] text-green-primary"
@@ -435,13 +438,13 @@ export const LandingView: React.FC<LandingViewProps> = ({
             <p className="mono text-[10px] text-[#ffcc00] font-black uppercase">Como o pedido funciona</p>
             <h2 className="display text-4xl md:text-5xl mt-3">Quatro lances. Sem perder tempo.</h2>
             <p className="mt-5 text-white/75 font-semibold leading-relaxed">
-              O cliente escolhe, envia uma vez, paga no Mercado Pago e acompanha tudo pelo proprio link do pedido.
+              O cliente escolhe, envia uma vez, paga no Mercado Pago e acompanha tudo pelo próprio link do pedido.
             </p>
           </div>
           <div className="space-y-0">
             {[
-              ["1", "Escolha o pacote", "Familia, Trio ou Individual."],
-              ["2", "Envie foto e dados", "Nome, email uma vez, cidade/UF e medidas do card."],
+              ["1", "Escolha o pacote", "Família, Trio ou Individual."],
+              ["2", "Envie foto e dados", "Nome, e-mail uma vez, cidade/UF e medidas do card."],
               ["3", "Pagamento seguro", "Checkout seguro do Mercado Pago."],
               ["4", "Baixe quando liberar", "A arte aparece na Minha Arquibancada e no pedido."],
             ].map(([number, title, text], index) => (
@@ -465,18 +468,18 @@ export const LandingView: React.FC<LandingViewProps> = ({
       <section className="bg-white py-18 md:py-24 border-b border-line-border">
         <div className="max-w-7xl mx-auto px-5 md:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-10">
           <div>
-            <p className="mono text-[10px] text-green-primary font-black uppercase">Duvidas que travam compra</p>
-            <h2 className="display text-4xl md:text-5xl text-[#103c27] mt-3">FAQ direto, sem enrolacao.</h2>
+            <p className="mono text-[10px] text-green-primary font-black uppercase">Dúvidas que travam a compra</p>
+            <h2 className="display text-4xl md:text-5xl text-[#103c27] mt-3">FAQ direto, sem enrolação.</h2>
             <p className="mt-4 text-[#65756b] font-bold">
-              A garantia aqui nao promete devolucao de arte personalizada. Ela promete clareza e entrega: se a foto estiver ruim, avisamos antes de produzir.
+              A garantia aqui não promete devolução de arte personalizada. Ela promete clareza e entrega: se a foto estiver ruim, avisamos antes de produzir.
             </p>
           </div>
           <div className="space-y-3">
             {[
-              ["Como imprimir?", "Leve o arquivo para uma grafica e peca papel adesivo fotografico brilhante, laminação brilho e corte individual. E o acabamento mais proximo de figurinha fisica."],
-              ["E se minha foto nao servir?", "A foto precisa mostrar o rosto com luz e nitidez. Se nao der para usar, o pedido informa o problema antes da arte final."],
-              ["Tem garantia?", "Tem Garantia de Arquivo Certo: voce recebe o arquivo digital contratado no link do pedido. Arte personalizada nao segue devolucao por arrependimento depois de produzida."],
-              ["Preciso ficar no site?", "Nao. O pedido fica salvo na Minha Arquibancada e o link pode ser aberto depois pelo email usado na compra."],
+              ["Como imprimir?", "Leve o arquivo para uma gráfica e peça papel adesivo fotográfico brilhante, laminação com brilho e corte individual. É o acabamento mais próximo de uma figurinha física."],
+              ["E se minha foto não servir?", "A foto precisa mostrar o rosto com luz e nitidez. Se não der para usar, o pedido informa o problema antes da arte final."],
+              ["Tem garantia?", "Tem Garantia de Arquivo Certo: você recebe o arquivo digital contratado no link do pedido. Arte personalizada não segue devolução por arrependimento depois de produzida."],
+              ["Preciso ficar no site?", "Não. O pedido fica salvo na Minha Arquibancada e o link pode ser aberto depois pelo e-mail usado na compra."],
             ].map(([question, answer]) => (
               <details key={question} className="group rounded-2xl border border-line-border bg-[#fff9e9] p-5">
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-black text-[#103c27]">
@@ -518,15 +521,15 @@ export const LandingView: React.FC<LandingViewProps> = ({
           <img
             className="absolute inset-0 w-full h-full object-cover opacity-30"
             src="/assets/imagem.png"
-            alt="Estadio iluminado"
+            alt="Estádio iluminado"
             referrerPolicy="no-referrer"
           />
           <div className="relative z-10 grid md:grid-cols-[1fr_auto] gap-6 items-center">
             <div>
-              <p className="mono text-[10px] text-yellow-primary font-black uppercase">Rodada relampago</p>
-              <h2 className="display text-3xl md:text-5xl mt-3">Nao deixa sua vaga cair para o proximo torcedor.</h2>
+              <p className="mono text-[10px] text-yellow-primary font-black uppercase">Rodada relâmpago</p>
+              <h2 className="display text-3xl md:text-5xl mt-3">Não deixe sua vaga cair para o próximo torcedor.</h2>
               <p className="mt-4 text-white/75 font-semibold max-w-xl">
-                Se tiver vaga hoje, sua FanCard entra na fila rapida. Depois das {offer.cutoffLabel}, a rodada vira proxima chamada.
+                Se tiver vaga hoje, sua FanCard entra na fila rápida. Depois das {offer.cutoffLabel}, a rodada vira próxima chamada.
               </p>
             </div>
             <button
@@ -544,10 +547,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <div className="max-w-7xl mx-auto px-5 md:px-8 flex flex-col md:flex-row gap-5 md:items-start md:justify-between">
           <div>
             <p className="mono text-[10px] text-[#365342] font-black">FANCARD BRASIL © 2026</p>
-            <p className="text-sm text-muted-text mt-2 font-bold">Sua torcida, sua historia, sua FanCard personalizada.</p>
+            <p className="text-sm text-muted-text mt-2 font-bold">Sua torcida, sua história, sua FanCard personalizada.</p>
           </div>
           <p className="text-[11px] leading-relaxed text-[#7e8a83] max-w-2xl md:text-right font-medium">
-            Servico independente de arte digital personalizada. Nao possui afiliacao, representacao, patrocinio ou autorizacao de FIFA, CBF, Panini, clubes, federacoes ou marcas oficiais.
+            Serviço independente de arte digital personalizada. Não possui afiliação, representação, patrocínio ou autorização de FIFA, CBF, Panini, clubes, federações ou marcas oficiais.
           </p>
         </div>
       </footer>
@@ -575,14 +578,14 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 <X className="w-5 h-5" />
               </button>
               <span className="inline-flex rounded-full bg-[#ffcc00] text-green-deep px-3 py-1 text-[10px] font-black uppercase tracking-wider">
-                ultima chamada da rodada
+                última chamada da rodada
               </span>
-              <h2 className="display text-3xl text-[#103c27] mt-4">O motivo pra pegar agora e simples.</h2>
+              <h2 className="display text-3xl text-[#103c27] mt-4">O motivo para pegar agora é simples.</h2>
               <p className="mt-3 text-[#65756b] font-bold leading-relaxed">
-                A fila relampago e separada para produzir hoje. Quando as {offer.remaining} vaga(s) acabarem ou passar de {offer.cutoffLabel}, seu pedido entra na proxima chamada e perde a prioridade da rodada.
+                A fila relâmpago é separada para produzir hoje. Quando as {offer.remaining} vaga(s) acabarem ou passar de {offer.cutoffLabel}, seu pedido entra na próxima chamada e perde a prioridade da rodada.
               </p>
               <div className="mt-4 grid grid-cols-3 gap-2">
-                {["prioridade hoje", "menor preco por arte", "torcida junta"].map((reason) => (
+                {["prioridade hoje", "menor preço por arte", "torcida junta"].map((reason) => (
                   <div key={reason} className="border border-[#103c27] bg-[#ffcc00] px-2 py-2 text-center text-[10px] font-black uppercase text-[#103c27] leading-tight">
                     {reason}
                   </div>

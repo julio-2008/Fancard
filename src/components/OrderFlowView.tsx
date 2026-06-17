@@ -1605,29 +1605,6 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                         </div>
 
                         {/* Confirmar E-mail */}
-                        <div className="hidden">
-                          <label htmlFor="confirmEmail" className="block text-xs font-black text-green-deep uppercase tracking-wider mb-2">
-                            Confirme seu E-mail
-                          </label>
-                          <input
-                            id="confirmEmail"
-                            type="email"
-                            required
-                            placeholder="Digite o mesmo e-mail novamente"
-                            value={orderState.deliveryData.confirmEmail || ""}
-                            onChange={(e) => {
-                              saveState({
-                                ...orderState,
-                                intent: orderState.intent || "",
-                                deliveryData: {
-                                  ...orderState.deliveryData,
-                                  confirmEmail: e.target.value
-                                }
-                              });
-                            }}
-                            className="w-full min-h-[44px] border border-line-border rounded-xl px-4 py-2.5 bg-soft-bg/20 text-green-deep font-bold focus:border-green-primary focus:bg-white outline-none transition"
-                          />
-                        </div>
                       </div>
 
                       {/* Botões do Formulário */}
