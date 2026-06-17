@@ -257,6 +257,7 @@ export async function createApp(options: CreateAppOptions = {}) {
         buyer: {
           name: buyer.name,
           email: buyer.email,
+          phone: buyer.phone,
         },
         items: processedItems,
         payment: {
@@ -359,6 +360,10 @@ export async function createApp(options: CreateAppOptions = {}) {
           orderId,
           accessToken,
           checkoutUrl: prefData.init_point,
+          packageName: newOrder.packageName,
+          packageId: newOrder.packageId,
+          quantity: newOrder.quantity,
+          price: newOrder.price,
         });
       } catch (mpErr: any) {
         console.warn(`[Mercado Pago] Falha na comunicação com gateway de pagamento (${mpErr?.message || mpErr}). Usando modo simulado de fallback.`);
@@ -381,6 +386,10 @@ export async function createApp(options: CreateAppOptions = {}) {
           orderId,
           accessToken,
           checkoutUrl: newOrder.payment.checkoutUrl,
+          packageName: newOrder.packageName,
+          packageId: newOrder.packageId,
+          quantity: newOrder.quantity,
+          price: newOrder.price,
         });
       }
 

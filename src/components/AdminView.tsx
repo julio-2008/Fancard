@@ -361,16 +361,14 @@ export function AdminView({ onBackHome }: AdminViewProps) {
 
   // Filter orders according to selection state
   const filteredOrders = orders.filter((o) => {
-    // 1. Filter by top status categories
-    if (filterStatus === "waiting_payment" && o.payment.status !== "approved") return true;
-    if (filterStatus === "waiting_production" && o.payment.status === "approved" && o.production.status === "waiting_admin_production") return true;
-    if (filterStatus === "in_production" && o.production.status === "in_production") return true;
-    if (filterStatus === "ready" && o.production.status === "ready") return true;
-    if (filterStatus !== "all") {
-      // Just double check we matched something if customized
-      if (filterStatus === "waiting_payment") return o.payment.status !== "approved";
-      if (filterStatus === "waiting_production") return o.payment.status === "approved" && o.production.status === "waiting_admin_production";
-    }
+    const matchesStatus =
+      filterStatus === "all" ||
+      (filterStatus === "waiting_payment" && o.payment.status !== "approved") ||
+      (filterStatus === "waiting_production" && o.payment.status === "approved" && o.production.status === "waiting_admin_production") ||
+      (filterStatus === "in_production" && o.production.status === "in_production") ||
+      (filterStatus === "ready" && (o.production.status === "ready" || o.production.status === "delivered"));
+
+    if (!matchesStatus) return false;
 
     // 2. Search query check (id, buyer name, or buyer email)
     if (searchQuery.trim() !== "") {

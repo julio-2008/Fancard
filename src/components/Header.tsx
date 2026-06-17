@@ -1,19 +1,21 @@
 import React from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trophy } from "lucide-react";
 import { Logo } from "./Logo";
 
 interface HeaderProps {
-  viewMode: "landing" | "order";
+  viewMode: "landing" | "order" | "arquibancada";
   onBackHome?: () => void;
   onScrollToPackages?: () => void;
+  onOpenArquibancada?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   viewMode,
   onBackHome,
   onScrollToPackages,
+  onOpenArquibancada,
 }) => {
-  if (viewMode === "order") {
+  if (viewMode === "order" || viewMode === "arquibancada") {
     return (
       <header className="border-b border-line-border bg-white/80 backdrop-blur-md sticky top-0 z-50 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between gap-4">
@@ -33,11 +35,11 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <button
             type="button"
-            onClick={onBackHome}
+            onClick={viewMode === "arquibancada" ? onScrollToPackages : onBackHome}
             className="inline-flex items-center gap-2 border border-line-border text-green-primary bg-white px-4 py-2.5 rounded-full text-xs md:text-sm font-extrabold hover:bg-soft-bg transition-all duration-200 cursor-pointer shadow-sm hover:translate-y-[-1px] active:translate-y-[0px]"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Voltar ao site</span>
+            <span>{viewMode === "arquibancada" ? "Ver pacotes" : "Voltar ao site"}</span>
           </button>
         </div>
       </header>
@@ -62,13 +64,23 @@ export const Header: React.FC<HeaderProps> = ({
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onScrollToPackages}
-          className="inline-flex items-center justify-center bg-white text-green-deep px-5 py-2.5 rounded-full font-black text-xs hover:bg-yellow-primary hover:text-green-deep hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer shadow-md focus:outline-none focus:ring-2 focus:ring-white uppercase tracking-wider"
-        >
-          VER PACOTES
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onOpenArquibancada}
+            className="hidden sm:inline-flex items-center justify-center gap-2 bg-white/10 border border-white/30 text-white px-4 py-2.5 rounded-full font-black text-[10px] hover:bg-white hover:text-green-deep transition-all duration-300 cursor-pointer shadow-md focus:outline-none focus:ring-2 focus:ring-white uppercase tracking-wider"
+          >
+            <Trophy className="w-4 h-4" />
+            Minha Arquibancada
+          </button>
+          <button
+            type="button"
+            onClick={onScrollToPackages}
+            className="inline-flex items-center justify-center bg-white text-green-deep px-5 py-2.5 rounded-full font-black text-xs hover:bg-yellow-primary hover:text-green-deep hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer shadow-md focus:outline-none focus:ring-2 focus:ring-white uppercase tracking-wider"
+          >
+            VER PACOTES
+          </button>
+        </div>
       </div>
     </header>
   );

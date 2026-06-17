@@ -4,10 +4,12 @@ import { LandingView } from "./components/LandingView";
 import { OrderFlowView } from "./components/OrderFlowView";
 import { PedidoStatusView } from "./components/PedidoStatusView";
 import { AdminView } from "./components/AdminView";
+import { ArquibancadaView } from "./components/ArquibancadaView";
 import { PackageId } from "./types";
+import { saveOrderHistoryItem } from "./lib/orderHistory";
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<"landing" | "order" | "pedido" | "admin">("landing");
+  const [viewMode, setViewMode] = useState<"landing" | "order" | "pedido" | "admin" | "arquibancada">("landing");
   const [selectedPackageId, setSelectedPackageId] = useState<PackageId | null>(null);
   
   // Public order Status trackers
@@ -25,11 +27,18 @@ export default function App() {
       const queryToken = query.get("token") || "";
 
       if (queryOrderId && queryToken) {
+        saveOrderHistoryItem({
+          orderId: queryOrderId,
+          accessToken: queryToken,
+          createdAt: new Date().toISOString(),
+        });
         setOrderId(queryOrderId);
         setOrderToken(queryToken);
         setViewMode("pedido");
       } else if (hash === "#criar") {
         setViewMode("order");
+      } else if (hash === "#arquibancada") {
+        setViewMode("arquibancada");
       } else if (hash.startsWith("#pedido/") || hash.startsWith("#/pedido/")) {
         // Formato esperado: #pedido/FC123456?token=tok_xxxxx ou #/pedido/FC123456?token=tok_xxxxx
         const rawPath = hash.startsWith("#/pedido/") 
@@ -42,6 +51,13 @@ export default function App() {
         if (queryPart) {
           const params = new URLSearchParams(queryPart);
           token = params.get("token") || "";
+        }
+        if (idPart && token) {
+          saveOrderHistoryItem({
+            orderId: idPart,
+            accessToken: token,
+            createdAt: new Date().toISOString(),
+          });
         }
         setOrderToken(token);
         setViewMode("pedido");
@@ -94,16 +110,29 @@ export default function App() {
     window.location.hash = "#home";
   };
 
-  const showHeader = viewMode === "landing" || viewMode === "order";
+  const openArquibancada = () => {
+    setViewMode("arquibancada");
+    window.location.hash = "#arquibancada";
+  };
+
+  const openSavedOrder = (id: string, token: string) => {
+    setOrderId(id);
+    setOrderToken(token);
+    window.location.hash = `#pedido/${id}?token=${token}`;
+    setViewMode("pedido");
+  };
+
+  const showHeader = viewMode === "landing" || viewMode === "order" || viewMode === "arquibancada";
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col justify-between">
       {/* Cabeçalho Oficial Adaptativo (Habilitado apenas na Landing e Fluxo de Compra) */}
       {showHeader && (
         <Header
-          viewMode={viewMode === "order" ? "order" : "landing"}
+          viewMode={viewMode === "order" ? "order" : viewMode === "arquibancada" ? "arquibancada" : "landing"}
           onBackHome={goBackToHome}
           onScrollToPackages={scrollPackages}
+          onOpenArquibancada={openArquibancada}
         />
       )}
 
@@ -113,6 +142,7 @@ export default function App() {
           <LandingView
             onStartFlow={startFlowStep}
             packagesRef={packagesRef}
+            onOpenArquibancada={openArquibancada}
           />
         )}
         
@@ -134,6 +164,13 @@ export default function App() {
         {viewMode === "admin" && (
           <AdminView
             onBackHome={goBackToHome}
+          />
+        )}
+
+        {viewMode === "arquibancada" && (
+          <ArquibancadaView
+            onBackHome={goBackToHome}
+            onOpenOrder={openSavedOrder}
           />
         )}
       </div>

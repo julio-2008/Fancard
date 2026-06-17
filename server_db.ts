@@ -83,6 +83,7 @@ export interface Order {
   buyer: {
     name: string;
     email: string;
+    phone?: string;
   };
   items: FanCardItem[];
   payment: {

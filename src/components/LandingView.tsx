@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { FancardPreview } from "./FancardPreview";
-import { Trophy, Check, ArrowRight, ShieldCheck, Mail, Sparkles, AlertCircle } from "lucide-react";
+import { Trophy, Check, ArrowRight, ShieldCheck, Mail, Sparkles, AlertCircle, Clock } from "lucide-react";
 import { PackageId } from "../types";
 
 // Importações não mais usadas como módulos (para evitar Vite MIME type issues), usamos URLs baseadas no static server do Express
@@ -10,11 +10,13 @@ import { PackageId } from "../types";
 interface LandingViewProps {
   onStartFlow: (packageId?: PackageId) => void;
   packagesRef: React.RefObject<HTMLDivElement | null>;
+  onOpenArquibancada: () => void;
 }
 
 export const LandingView: React.FC<LandingViewProps> = ({
   onStartFlow,
   packagesRef,
+  onOpenArquibancada,
 }) => {
   const [feedbacks, setFeedbacks] = useState<Array<{
     id: string;
@@ -176,6 +178,26 @@ export const LandingView: React.FC<LandingViewProps> = ({
       </section>
 
       {/* 2. SEÇÃO DE BENEFÍCIOS ("O que você recebe") */}
+      <section className="bg-white border-b border-line-border py-8">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 grid md:grid-cols-3 gap-4">
+          <div className="rounded-2xl border border-line-border bg-cream-light p-5">
+            <ShieldCheck className="w-6 h-6 text-green-primary mb-3" />
+            <h2 className="font-black text-[#103c27]">Foto analisada antes da arte</h2>
+            <p className="text-sm text-[#65756b] font-semibold mt-2">O pedido usa foto com rosto visivel para produzir uma FanCard melhor.</p>
+          </div>
+          <div className="rounded-2xl border border-line-border bg-cream-light p-5">
+            <Clock className="w-6 h-6 text-green-primary mb-3" />
+            <h2 className="font-black text-[#103c27]">Acompanhe cada lance</h2>
+            <p className="text-sm text-[#65756b] font-semibold mt-2">A Minha Arquibancada guarda pedidos, status, link de pagamento e entrega.</p>
+          </div>
+          <div className="rounded-2xl border border-line-border bg-cream-light p-5">
+            <Trophy className="w-6 h-6 text-green-primary mb-3" />
+            <h2 className="font-black text-[#103c27]">Entrega liberada no site</h2>
+            <p className="text-sm text-[#65756b] font-semibold mt-2">Quando a arte estiver pronta, o download aparece no proprio pedido.</p>
+          </div>
+        </div>
+      </section>
+
       <section 
         style={{ backgroundColor: "#ffe600" }}
         className="border-y border-line-border py-12 md:py-16"
@@ -390,6 +412,16 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <p className="mt-12 text-center text-[#6f7e74] text-sm font-bold">
           Continue na Chave FanCard e complete as informações com muita facilidade.
         </p>
+        <div className="mt-5 flex justify-center">
+          <button
+            type="button"
+            onClick={onOpenArquibancada}
+            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-green-primary text-green-primary px-6 py-3 text-xs font-black uppercase tracking-wider hover:bg-green-primary hover:text-white transition"
+          >
+            <Trophy className="w-4 h-4" />
+            Abrir Minha Arquibancada
+          </button>
+        </div>
       </section>
 
       {/* 4. SEÇÃO "COMO O PEDIDO FUNCIONA" */}

@@ -11,6 +11,7 @@ import { FancardPreview } from "./FancardPreview";
 import { Logo } from "./Logo";
 import { MercadoPagoCard } from "./MercadoPagoCard";
 import { validatePhotoFile } from "../lib/imageValidation";
+import { saveOrderHistoryItem } from "../lib/orderHistory";
 
 interface OrderFlowViewProps {
   initialPackageId: PackageId | null;
@@ -28,10 +29,6 @@ const stepOrder: OrderStep[] = [
   "photo",
   "delivery",
   "summary",
-  "card",
-  "pix",
-  "review",
-  "production",
 ];
 
 const stepNamesMap: Record<OrderStep, string> = {
@@ -547,11 +544,14 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
     setIsSubmittingOrder(true);
     showToast("⏰ Criando seu pedido seguro e processando as fotos... Aguarde.");
 
+    const currentPackageId = orderState.packageId || "individual";
+    const packageInfo = packageMap[currentPackageId];
     const payload = {
-      packageId: orderState.packageId || "individual",
+      packageId: currentPackageId,
       buyer: {
         name: orderState.deliveryData.buyerName,
         email: orderState.deliveryData.buyerEmail,
+        phone: orderState.deliveryData.phone,
       },
       items: (orderState.items || []).map((item, idx) => ({
         photo: item.photo,
@@ -592,12 +592,18 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
 
     showToast("🚀 Pedido e faturamento gerados! Redirecionando...");
     localStorage.removeItem("fancardProgressData");
-    localStorage.setItem("fancardLastOrder", JSON.stringify({
+    saveOrderHistoryItem({
       orderId: data.orderId,
       accessToken: data.accessToken,
       checkoutUrl: data.checkoutUrl,
+      packageName: data.packageName || packageInfo.name,
+      packageId: currentPackageId,
+      quantity: packageInfo.quantity,
+      price: packageInfo.priceValue,
+      buyerName: orderState.deliveryData.buyerName,
+      buyerEmail: orderState.deliveryData.buyerEmail,
       createdAt: new Date().toISOString(),
-    }));
+    });
 
     // Redirect immediately to Checkout Pro or simulated test window
     if (!data.checkoutUrl) {
@@ -698,7 +704,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
           <p className="mt-4 max-w-3xl text-muted-text text-sm sm:text-base leading-relaxed font-semibold">
             {orderState.activeStep === "production"
               ? "Nossos designers já estão tratando seu arquivo, removendo o fundo e aplicando o mockup dourado."
-              : "Defina o pacote, personalize seu jogador com estatísticas completas, veja o card finalizado e acompanhe a esteira de fabricação."
+              : "Defina o pacote, personalize seu jogador, revise os dados e acompanhe o pedido pela Minha Arquibancada."
             }
           </p>
         </div>
@@ -713,7 +719,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
             <div>
               <p className="font-extrabold text-white text-xs tracking-tight leading-none">Chave FanCard</p>
               <p className="text-[10px] sm:text-xs text-white/70 mt-1 font-bold leading-none">
-                Etapa {stepOrder.indexOf(orderState.activeStep) + 1} de 9: <span className="text-yellow-primary uppercase tracking-wide font-mono">{stepNamesMap[orderState.activeStep]}</span>
+                Etapa {stepOrder.indexOf(orderState.activeStep) + 1} de {stepOrder.length}: <span className="text-yellow-primary uppercase tracking-wide font-mono">{stepNamesMap[orderState.activeStep]}</span>
               </p>
             </div>
           </div>
@@ -1498,7 +1504,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                     Onde devemos enviar suas figurinhas oficiais?
                   </h2>
                   <p className="text-muted-text mt-2 font-medium">
-                    Suas figurinhas finais em alta fidelidade serão geradas pelo nosso sistema e disponibilizadas na sua área de cliente. Também notificaremos você por e-mail e WhatsApp assim que a fabricação terminar.
+                    Suas figurinhas finais em alta fidelidade serão disponibilizadas no link do pedido. Você também pode acompanhar tudo na Minha Arquibancada e ativar alerta do navegador quando a arte ficar pronta.
                   </p>
 
                   <div className="mt-8 grid lg:grid-cols-12 gap-8 items-start">
@@ -1530,15 +1536,14 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                           />
                         </div>
 
-                        {/* WhatsApp / Celular */}
+                        {/* Telefone opcional */}
                         <div>
                           <label htmlFor="buyerPhone" className="block text-xs font-black text-green-deep uppercase tracking-wider mb-2">
-                            WhatsApp / Celular com DDD
+                            Telefone opcional com DDD
                           </label>
                           <input
                             id="buyerPhone"
                             type="tel"
-                            required
                             placeholder="Ex: (11) 99999-9999"
                             value={orderState.deliveryData.phone || ""}
                             onChange={(e) => {

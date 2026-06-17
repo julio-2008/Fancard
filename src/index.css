@@ -114,6 +114,10 @@ body {
   margin-bottom: 0;
 }
 
+.bracket-wrap > .bracket-round:nth-of-type(n + 4) {
+  display: none;
+}
+
 .round-title {
   font-family: var(--font-mono);
   font-size: 8.5px;
@@ -145,4 +149,3 @@ body {
   border-radius: 50%;
   opacity: 0.4;
 }
-
