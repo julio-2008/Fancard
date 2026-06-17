@@ -95,6 +95,8 @@ export function AdminView({ onBackHome }: AdminViewProps) {
 
   // Sound context
   const audioContext = React.useRef<AudioContext | null>(null);
+  const knownPaidOrderIds = React.useRef<Set<string>>(new Set());
+  const didHydratePaidOrders = React.useRef(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
 
   // Toast helper
@@ -236,6 +238,18 @@ export function AdminView({ onBackHome }: AdminViewProps) {
       const sorted = (data as Order[]).sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
+      const paidOrderIds = new Set(
+        sorted
+          .filter((order) => order.payment.status === "approved" && order.production.status !== "ready" && order.production.status !== "delivered")
+          .map((order) => order.id)
+      );
+      const newPaidOrders = [...paidOrderIds].filter((id) => !knownPaidOrderIds.current.has(id));
+      if (didHydratePaidOrders.current && newPaidOrders.length > 0) {
+        playAlertSound("paid");
+        showToast(`${newPaidOrders.length} novo(s) pedido(s) pago(s) aguardando producao.`);
+      }
+      knownPaidOrderIds.current = paidOrderIds;
+      didHydratePaidOrders.current = true;
       setOrders(sorted);
       
       // Auto-select first order if none selected

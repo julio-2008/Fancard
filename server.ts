@@ -121,6 +121,50 @@ export async function createApp(options: CreateAppOptions = {}) {
 
 
 
+  const EXPRESS_SLOT_LIMIT = 7;
+  const EXPRESS_CUTOFF_HOUR = 20;
+  const OFFER_TIMEZONE = "America/Bahia";
+  const DEADLINES: Record<string, string> = {
+    individual: "ate 1 hora",
+    trio: "ate 2 horas",
+    familia: "ate 2 horas",
+  };
+
+  const getOfferDateKey = (date = new Date()) => new Intl.DateTimeFormat("en-CA", {
+    timeZone: OFFER_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+
+  const getOfferHour = () => Number(new Intl.DateTimeFormat("pt-BR", {
+    timeZone: OFFER_TIMEZONE,
+    hour: "2-digit",
+    hour12: false,
+  }).format(new Date()));
+
+  const buildOfferStatus = (orders: Order[]) => {
+    const todayKey = getOfferDateKey();
+    const used = orders.filter((order) => {
+      const validPayment = !["cancelled", "refunded", "rejected"].includes(order.payment.status);
+      return validPayment && getOfferDateKey(new Date(order.createdAt)) === todayKey;
+    }).length;
+    const remaining = Math.max(0, EXPRESS_SLOT_LIMIT - used);
+    const cutoffPassed = getOfferHour() >= EXPRESS_CUTOFF_HOUR;
+
+    return {
+      label: "Convocacao Relampago",
+      limit: EXPRESS_SLOT_LIMIT,
+      used,
+      remaining,
+      cutoffHour: EXPRESS_CUTOFF_HOUR,
+      cutoffLabel: `${EXPRESS_CUTOFF_HOUR}h`,
+      isOpen: remaining > 0 && !cutoffPassed,
+      timezone: OFFER_TIMEZONE,
+      deadlines: DEADLINES,
+    };
+  };
+
   // ==================== ADMINISTRATIVE LOGIN API ====================
 
   app.post("/api/admin/login", (req, res) => {
@@ -164,6 +208,11 @@ export async function createApp(options: CreateAppOptions = {}) {
       return res.json({ authenticated: false });
     }
     return res.json({ authenticated: true });
+  });
+
+  app.get("/api/offer/status", async (_req, res) => {
+    const orders = await loadOrders();
+    return res.json(buildOfferStatus(orders));
   });
 
   // ==================== ORDER CREATION WITH MERCADO PAGO PREFERENCE ====================
@@ -239,6 +288,9 @@ export async function createApp(options: CreateAppOptions = {}) {
             uf: item.cardData.uf,
             height: item.cardData.height,
             weight: item.cardData.weight,
+            team: item.cardData.team,
+            country: item.cardData.country,
+            position: item.cardData.position,
           },
           generatedPrompt: promptText,
         });
@@ -364,6 +416,7 @@ export async function createApp(options: CreateAppOptions = {}) {
           packageId: newOrder.packageId,
           quantity: newOrder.quantity,
           price: newOrder.price,
+          offer: buildOfferStatus(orders),
         });
       } catch (mpErr: any) {
         console.warn(`[Mercado Pago] Falha na comunicação com gateway de pagamento (${mpErr?.message || mpErr}). Usando modo simulado de fallback.`);
@@ -390,6 +443,7 @@ export async function createApp(options: CreateAppOptions = {}) {
           packageId: newOrder.packageId,
           quantity: newOrder.quantity,
           price: newOrder.price,
+          offer: buildOfferStatus(orders),
         });
       }
 

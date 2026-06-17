@@ -19,8 +19,8 @@ interface OrderFlowViewProps {
 }
 
 const packageMap = {
-  individual: { name: "Individual", quantity: 1, price: "R$ 14,90", priceValue: 14.90 },
-  trio: { name: "Trio", quantity: 3, price: "R$ 26,97", priceValue: 26.97 },
+  individual: { name: "Individual", quantity: 1, price: "R$ 14,90", priceValue: 14.90, deadline: "ate 1 hora" },
+  trio: { name: "Trio", quantity: 3, price: "R$ 26,97", priceValue: 26.97, deadline: "ate 2 horas" },
   familia: { name: "Família / Amigos", quantity: 5, price: "R$ 35,97", priceValue: 35.97 },
 };
 
@@ -1048,7 +1048,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                     <button
                       type="button"
                       onClick={() => handleSelectPackage("individual")}
-                      className={`choice-card text-left p-6 border rounded-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between ${
+                      className={`choice-card order-3 text-left p-6 border rounded-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between ${
                         orderState.packageId === "individual"
                           ? "border-green-primary bg-green-primary/5 shadow-md scale-102"
                           : "border-line-border bg-white hover:border-green-primary/50 hover:shadow-md"
@@ -1075,7 +1075,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                     <button
                       type="button"
                       onClick={() => handleSelectPackage("trio")}
-                      className={`choice-card text-left p-6 border rounded-2xl cursor-pointer transition-all duration-300 relative flex flex-col justify-between ${
+                      className={`choice-card order-2 text-left p-6 border rounded-2xl cursor-pointer transition-all duration-300 relative flex flex-col justify-between ${
                         orderState.packageId === "trio"
                           ? "border-yellow-primary bg-yellow-primary/5 shadow-md scale-102"
                           : "border-line-border bg-white hover:border-[#103c27]/40 hover:shadow-md"
@@ -1103,7 +1103,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                     <button
                       type="button"
                       onClick={() => handleSelectPackage("familia")}
-                      className={`choice-card text-left p-6 border rounded-2xl cursor-pointer transition-all duration-300 bg-[#092916] relative flex flex-col justify-between ${
+                      className={`choice-card order-1 text-left p-6 border rounded-2xl cursor-pointer transition-all duration-300 bg-[#092916] relative flex flex-col justify-between ${
                         orderState.packageId === "familia"
                           ? "border-yellow-primary shadow-2xl scale-[1.02] text-white ring-2 ring-yellow-primary/45"
                           : "border-yellow-primary/40 hover:border-yellow-primary hover:shadow-xl hover:translate-y-[-2px]"

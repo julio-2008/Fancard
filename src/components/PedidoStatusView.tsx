@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Check, Copy, Download, Loader2, ShieldCheck, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -230,7 +230,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
       });
       if (response.ok) {
         setNotification({
-          message: "⚡ Pagamento simulado com SUCESSO via backend! Atualizando status...",
+          message: "âš¡ Pagamento simulado com SUCESSO via backend! Atualizando status...",
           type: "success",
         });
         setTimeout(() => setNotification(null), 5000);
@@ -239,10 +239,10 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
         return;
       }
     } catch (err) {
-      console.warn("Erro de requisição na simulação de pagamento, simulando localmente:", err);
+      console.warn("Erro de requisiÃ§Ã£o na simulaÃ§Ã£o de pagamento, simulando localmente:", err);
     }
 
-    // Código de fallback local
+    // CÃ³digo de fallback local
     const localOrders = JSON.parse(localStorage.getItem("fancard_local_orders") || "[]");
     const orderIdx = localOrders.findIndex((o: any) => o.id === orderId);
     if (orderIdx !== -1) {
@@ -255,13 +255,13 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
       localStorage.setItem("fancard_local_orders", JSON.stringify(localOrders));
       
       setNotification({
-        message: "⚡ Pagamento simulado com SUCESSO localmente! Atualizando status...",
+        message: "âš¡ Pagamento simulado com SUCESSO localmente! Atualizando status...",
         type: "success",
       });
       setTimeout(() => setNotification(null), 5000);
       await fetchOrder();
     } else {
-      alert("Erro ao enviar comando de simulação para o servidor.");
+      alert("Erro ao enviar comando de simulaÃ§Ã£o para o servidor.");
     }
     setSimulatingPayment(false);
   };
@@ -276,7 +276,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
     const fakeFinalFiles = order.items.map((item) => ({
       id: "final_sim_" + Math.random().toString(36).substring(2, 9),
       itemId: item.id,
-      url: item.photoUrl, // Usa a própria imagem do cliente para a miniatura / download final!
+      url: item.photoUrl, // Usa a prÃ³pria imagem do cliente para a miniatura / download final!
       fileName: `fancard_final_${item.index}.png`,
       uploadedAt: new Date().toISOString(),
     }));
@@ -288,19 +288,19 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
       localStorage.setItem("fancard_local_orders", JSON.stringify(localOrders));
       
       setNotification({
-        message: "🎨 Design finalizado com SUCESSO! Agora você já pode visualizar e testar o download das suas figurinhas.",
+        message: "ðŸŽ¨ Design finalizado com SUCESSO! Agora vocÃª jÃ¡ pode visualizar e testar o download das suas figurinhas.",
         type: "success",
       });
       setTimeout(() => setNotification(null), 5000);
       await fetchOrder();
     } else {
-      // Se não for pedido de local storage, tenta fazer um patch emulado no estado local
+      // Se nÃ£o for pedido de local storage, tenta fazer um patch emulado no estado local
       const mockOrder = { ...order };
       mockOrder.production.status = "ready";
       mockOrder.production.finalFiles = fakeFinalFiles;
       setOrder(mockOrder);
       setNotification({
-        message: "🎨 Design finalizado com SUCESSO na esteira sandbox local! Aproveite o teste.",
+        message: "ðŸŽ¨ Design finalizado com SUCESSO na esteira sandbox local! Aproveite o teste.",
         type: "success",
       });
       setTimeout(() => setNotification(null), 5000);
@@ -325,12 +325,12 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
           <AlertTriangle className="w-8 h-8" />
         </div>
         <h2 className="display text-3xl text-red-950 font-black mb-3">
-          {errorCode === "UNAUTHORIZED" ? "Acesso não Autorizado" : "Pedido Não Localizado"}
+          {errorCode === "UNAUTHORIZED" ? "Acesso nÃ£o Autorizado" : "Pedido NÃ£o Localizado"}
         </h2>
         <p className="max-w-md text-red-800 text-sm leading-relaxed mb-8">
           {errorCode === "UNAUTHORIZED"
-            ? "O token de acesso fornecido para este link é inválido. Certifique-se de que copiou o endereço do pedido corretamente."
-            : "Não conseguimos localizar nenhuma chave correspondente a essa identificação em nosso banco de dados."}
+            ? "O token de acesso fornecido para este link Ã© invÃ¡lido. Certifique-se de que copiou o endereÃ§o do pedido corretamente."
+            : "NÃ£o conseguimos localizar nenhuma chave correspondente a essa identificaÃ§Ã£o em nosso banco de dados."}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {onOpenArquibancada && (
@@ -345,7 +345,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
             onClick={onBackHome}
             className="inline-flex items-center justify-center gap-2 bg-green-primary text-white px-6 py-3 rounded-full font-bold shadow-md hover:bg-green-deep transition-all cursor-pointer text-sm"
           >
-            <ArrowLeft className="w-4 h-4" /> Voltar ao Início
+            <ArrowLeft className="w-4 h-4" /> Voltar ao InÃ­cio
           </button>
         </div>
       </div>
@@ -356,6 +356,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
   const isPaid = order.payment.status === "approved";
   const isProductionReady = order.production.status === "ready" || order.production.status === "delivered";
   const isProductionStarted = order.production.status === "in_production" || order.production.status === "ready";
+  const productionDeadline = order.packageId === "individual" ? "ate 1 hora" : "ate 2 horas";
   
   return (
     <main className="w-full min-h-screen bg-[#fffdfa] pt-24 pb-20 px-4 sm:px-6 lg:px-8">
@@ -363,7 +364,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-3xl max-w-sm w-full shadow-2xl">
             <h2 className="text-2xl font-black text-[#103c27] mb-2">Avalie sua FanCard!</h2>
-            <p className="text-sm text-gray-500 mb-6">Como foi sua experiência? Seu feedback nos ajuda a melhorar!</p>
+            <p className="text-sm text-gray-500 mb-6">Como foi sua experiÃªncia? Seu feedback nos ajuda a melhorar!</p>
             <div className="flex gap-2 mb-6 justify-center">
               {[1, 2, 3, 4, 5].map((r) => (
                 <button
@@ -371,13 +372,13 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
                   onClick={() => setRating(r)}
                   className={`text-4xl transition-all ${rating >= r ? "text-yellow-400 scale-110" : "text-gray-200"}`}
                 >
-                  ★
+                  â˜…
                 </button>
               ))}
             </div>
             <textarea
               className="w-full border border-gray-200 rounded-2xl p-4 mb-6 min-h-[100px] text-sm"
-              placeholder="O que achou do tempo de produção, da qualidade da arte? (mín 15 caracteres)"
+              placeholder="O que achou do tempo de produÃ§Ã£o, da qualidade da arte? (mÃ­n 15 caracteres)"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
@@ -396,7 +397,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
               }}
               className="w-full bg-[#103c27] text-white py-4 rounded-full font-black text-sm hover:bg-[#1a5e3e] transition-all disabled:opacity-50"
             >
-              {submitting ? "Enviando..." : "Enviar Avaliação"}
+              {submitting ? "Enviando..." : "Enviar AvaliaÃ§Ã£o"}
             </button>
           </div>
         </div>
@@ -412,16 +413,16 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
           </div>
         )}
 
-        {/* Notificação de simpificação para ambiente local */}
+        {/* NotificaÃ§Ã£o de simpificaÃ§Ã£o para ambiente local */}
         {isSimulationParam && !isPaid && (
           <div className="mb-6 p-5 rounded-2xl bg-[#ffecd1]/40 border border-[#ffb347]/50 text-amber-950 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm animate-fade-in">
             <div>
               <div className="flex items-center gap-2 font-black text-xs text-amber-800 uppercase tracking-wider mono mb-1">
                 <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-                Ambiente de Homologação Sandbox
+                Ambiente de HomologaÃ§Ã£o Sandbox
               </div>
               <p className="text-xs font-medium leading-relaxed max-w-xl">
-                Você escolheu simulador nas variáveis do Mercado Pago. Para testar o fluxo de ponta a ponta sem chave real, use o botão de simulação do servidor abaixo para marcar este pedido como pago no banco de dados.
+                VocÃª escolheu simulador nas variÃ¡veis do Mercado Pago. Para testar o fluxo de ponta a ponta sem chave real, use o botÃ£o de simulaÃ§Ã£o do servidor abaixo para marcar este pedido como pago no banco de dados.
               </p>
             </div>
             <button
@@ -429,7 +430,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
               disabled={simulatingPayment}
               className="bg-amber-800 text-white rounded-xl px-4 py-2.5 text-xs font-bold hover:bg-amber-950 focus:outline-none transition-all disabled:opacity-50 inline-flex items-center gap-2 shrink-0 cursor-pointer shadow"
             >
-              {simulatingPayment ? <Loader2 className="w-4 h-4 animate-spin" /> : "⚡ Aprovar Pagamento"}
+              {simulatingPayment ? <Loader2 className="w-4 h-4 animate-spin" /> : "âš¡ Aprovar Pagamento"}
             </button>
           </div>
         )}
@@ -442,19 +443,19 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
                 Simulador de Esteira de Design
               </div>
               <p className="text-xs font-medium leading-relaxed max-w-xl">
-                O pagamento foi aprovado! Em ambiente de produção real, nossa equipe cria as artes finais. No modo sandbox, você mesmo pode simular a finalização do design para gerar as artes e testar a visualização e downloads.
+                O pagamento foi aprovado! Em ambiente de produÃ§Ã£o real, nossa equipe cria as artes finais. No modo sandbox, vocÃª mesmo pode simular a finalizaÃ§Ã£o do design para gerar as artes e testar a visualizaÃ§Ã£o e downloads.
               </p>
             </div>
             <button
               onClick={handleSimulateProductionReady}
               className="bg-green-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold hover:bg-green-800 focus:outline-none transition-all inline-flex items-center gap-2 shrink-0 cursor-pointer shadow"
             >
-              🎨 Concluir Design e Liberar Downloads
+              ðŸŽ¨ Concluir Design e Liberar Downloads
             </button>
           </div>
         )}
 
-        {/* 1. CABEÇALHO DO STATUS */}
+        {/* 1. CABEÃ‡ALHO DO STATUS */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-line-border/30 pb-6">
           <div>
             <div className="flex items-center gap-3">
@@ -494,7 +495,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
           </div>
         </div>
 
-        {/* 2. ESTADO VISUAL DA ESTAÇÃO DE PEDIDO (PROGRESS STEPPER) */}
+        {/* 2. ESTADO VISUAL DA ESTAÃ‡ÃƒO DE PEDIDO (PROGRESS STEPPER) */}
         <section className="bg-white border border-line-border/20 rounded-[28px] p-6 sm:p-8 mt-8 shadow-sm">
           <h2 className="mono text-[10px] text-green-primary font-bold uppercase tracking-widest tracking-wide mb-6">
             Status do Processo
@@ -529,20 +530,20 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
                 <p className="text-xs text-muted-text mt-1">
                   {isPaid 
                     ? "Faturamento aprovado de forma segura." 
-                    : "Aguardando confirmação do Mercado Pago."}
+                    : "Aguardando confirmaÃ§Ã£o do Mercado Pago."}
                 </p>
                 {!isPaid && order.payment.checkoutUrl && (
                   <a
                     href={order.payment.checkoutUrl}
                     className="inline-flex mt-2 text-xs font-extrabold text-[#ffb300] hover:underline"
                   >
-                    👉 Pagar agora com Mercado Pago
+                    ðŸ‘‰ Pagar agora com Mercado Pago
                   </a>
                 )}
               </div>
             </div>
 
-            {/* Step 2: Produção Status */}
+            {/* Step 2: ProduÃ§Ã£o Status */}
             <div className="flex gap-4 items-start relative z-10">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm shadow ${
                 isProductionReady 
@@ -559,35 +560,35 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
               </div>
               <div>
                 <h4 className="font-bold text-[#103c27] text-sm">
-                  {isProductionReady ? "Pronto para baixar" : isProductionStarted ? "Em produção" : "Aguardando produção"}
+                  {isProductionReady ? "Pronto para baixar" : isProductionStarted ? "Em produÃ§Ã£o" : "Aguardando produÃ§Ã£o"}
                 </h4>
                 <p className="text-xs text-muted-text mt-1">
                   {isProductionReady 
-                    ? "Sua FanCard tática está pronta para download!" 
+                    ? "Sua FanCard tÃ¡tica estÃ¡ pronta para download!" 
                     : isProductionStarted
-                      ? "Nossa esteira profissional de design está atuando na sua arte." 
-                      : "Aguardando aprovação do pagamento."}
+                      ? "Nossa esteira profissional de design estÃ¡ atuando na sua arte." 
+                      : "Aguardando aprovaÃ§Ã£o do pagamento."}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Banner centralizadora dependendo do status de produção atual */}
+          {/* Banner centralizadora dependendo do status de produÃ§Ã£o atual */}
           <div className="mt-8 p-5 rounded-2xl bg-[#fcf9f2] border border-line-border/10 flex flex-col sm:flex-row items-center gap-4 justify-between">
             <div className="text-center sm:text-left">
               <h3 className="font-black text-sm text-[#103c27]">
                 {!isPaid 
-                  ? "Aguardando Confirmação do Pagamento" 
+                  ? "Aguardando ConfirmaÃ§Ã£o do Pagamento" 
                   : !isProductionReady 
-                    ? "🔑 Seu design está em produção personalizada" 
-                    : "🏆 Suas FanCards Premium estão prontas!"}
+                    ? "ðŸ”‘ Seu design estÃ¡ em produÃ§Ã£o personalizada" 
+                    : "ðŸ† Suas FanCards Premium estÃ£o prontas!"}
               </h3>
               <p className="text-xs text-muted-text mt-1 max-w-xl">
                 {!isPaid 
-                  ? "Assim que o pix ou cartão for confirmado no Mercado Pago, nossa equipe inicia a modelagem da sua arte feita sob medida imediatamente. A estimativa de produção é de até 12 horas ou 1 dia útil." 
+                  ? `Assim que o pix ou cartao for confirmado no Mercado Pago, sua arte entra na Convocacao Relampago. A estimativa desta rodada e de ${productionDeadline}.` 
                   : !isProductionReady 
-                    ? "Nossos especialistas em design gráfico cuidam da remoção de fundo com inteligência artificial, tratamento de iluminação e harmonia de cores para que seu card fique impecável. O tempo de produção é de até 12 horas ou 1 dia útil." 
-                    : "Sua arte digital concluída foi qualificada e liberada com design profissional de alta fidelidade. Faça o seu download em excelente definição abaixo."}
+                    ? `Nossa equipe cuida da remocao de fundo, tratamento de iluminacao e harmonia de cores para deixar seu card pronto. Tempo estimado nesta rodada: ${productionDeadline}.` 
+                    : "Sua arte digital concluÃ­da foi qualificada e liberada com design profissional de alta fidelidade. FaÃ§a o seu download em excelente definiÃ§Ã£o abaixo."}
               </p>
             </div>
 
@@ -621,7 +622,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
                   }`}
                 >
                   <div className="p-5 flex gap-4 items-start">
-                    {/* Imagem original do cliente para comparação tática */}
+                    {/* Imagem original do cliente para comparaÃ§Ã£o tÃ¡tica */}
                     <div className="w-16 h-20 bg-cream rounded-xl overflow-hidden shrink-0 border border-line-border/15 relative">
                       <img 
                         src={item.photoUrl} 
@@ -662,7 +663,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
                   {/* Detalhes de download se estiver pronta */}
                   {isReady && finalFile ? (
                     <div className="bg-[#fffdf2] p-4 border-t border-yellow-primary/10 flex flex-col gap-3">
-                      {/* Visualização miniatura do resultado */}
+                      {/* VisualizaÃ§Ã£o miniatura do resultado */}
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-14 bg-gray-200 rounded-lg overflow-hidden shrink-0 relative border border-yellow-primary/30">
                           <img 
@@ -691,8 +692,8 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
                   ) : (
                     <div className="p-4 bg-gray-50 border-t border-gray-100 text-center text-xs text-gray-500 font-medium">
                       {isPaid 
-                        ? "Design sob análise. O upload final aparecerá aqui." 
-                        : "Liberação pendente de confirmação de pagamento."}
+                        ? "Design sob anÃ¡lise. O upload final aparecerÃ¡ aqui." 
+                        : "LiberaÃ§Ã£o pendente de confirmaÃ§Ã£o de pagamento."}
                     </div>
                   )}
                 </div>
@@ -701,7 +702,7 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
           </div>
         </section>
 
-        {/* 4. SEÇÃO DO RESUMO DO COMPRADOR */}
+        {/* 4. SEÃ‡ÃƒO DO RESUMO DO COMPRADOR */}
         <section className="bg-white border border-line-border/20 rounded-[28px] p-6 sm:p-8 mt-8 shadow-sm">
           <h2 className="mono text-[10px] text-green-primary font-bold uppercase tracking-widest tracking-wide mb-4">
             Detalhes da Compra
@@ -727,11 +728,11 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
             onClick={onBackHome}
             className="inline-flex items-center gap-2 text-green-primary hover:text-green-deep text-xs font-black uppercase tracking-widest cursor-pointer"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Voltar à Página Inicial
+            <ArrowLeft className="w-3.5 h-3.5" /> Voltar Ã  PÃ¡gina Inicial
           </button>
           <div className="flex items-center justify-center gap-2 text-muted-text/65 text-[10px] mt-6 font-mono">
             <ShieldCheck className="w-4 h-4 text-green-primary" />
-            CONEXÃO TOTALMENTE CRIPTOGRAFADA E SEGURA COM MERCADO PAGO®
+            CONEXÃƒO TOTALMENTE CRIPTOGRAFADA E SEGURA COM MERCADO PAGOÂ®
           </div>
         </div>
 
@@ -739,3 +740,5 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
     </main>
   );
 }
+
+

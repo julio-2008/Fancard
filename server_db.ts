@@ -59,6 +59,9 @@ export interface FanCardItem {
     uf?: string;
     height?: string;
     weight?: string;
+    team?: string;
+    country?: string;
+    position?: string;
   };
   generatedPrompt: string;
 }
