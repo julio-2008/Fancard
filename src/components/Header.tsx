@@ -68,9 +68,9 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onOpenArquibancada}
-            className="inline-flex items-center justify-center gap-2 bg-white text-green-deep px-5 py-2.5 rounded-full font-black text-xs hover:bg-yellow-primary hover:text-green-deep hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer shadow-md focus:outline-none focus:ring-2 focus:ring-white uppercase tracking-wider"
+            className="inline-flex items-center justify-center gap-1.5 bg-white text-green-deep px-3 py-2 rounded-full font-black text-[10px] sm:text-xs hover:bg-yellow-primary hover:text-green-deep hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer shadow-md focus:outline-none focus:ring-2 focus:ring-white uppercase tracking-wider"
           >
-            <Trophy className="w-4 h-4" />
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Minha Arquibancada
           </button>
         </div>

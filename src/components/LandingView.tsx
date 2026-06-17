@@ -52,15 +52,15 @@ const packageCards: Array<{
 }> = [
   {
     id: "familia",
-    title: "Selecao Completa",
+    title: "Escalacao Completa",
     subtitle: "5 FanCards para familia, amigos ou grupo",
     oldPrice: "R$ 74,50",
     price: "R$ 35,97",
     unit: "R$ 7,19 cada",
     deadline: "ate 2 horas",
-    badge: "mais vantajoso",
+    badge: "RECOMENDADO - 51% OFF",
     featured: true,
-    note: "Comece pelo pacote campeao: mais gente, menor preco por figurinha e entrega rapida na rodada de hoje.",
+    note: "O pacote que mais combina com torcida: todo mundo vira figurinha e o preco por arte cai forte.",
   },
   {
     id: "trio",
@@ -70,7 +70,7 @@ const packageCards: Array<{
     price: "R$ 26,97",
     unit: "R$ 8,99 cada",
     deadline: "ate 2 horas",
-    badge: "quase 40% off",
+    badge: "quase 40% OFF",
     note: "A escolha certa para nao deixar ninguem de fora e ainda pagar menos por arte.",
   },
   {
@@ -182,17 +182,17 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
   return (
     <div className="w-full bg-[#fffdf7] pb-24 md:pb-0">
-      <div className="fixed inset-x-0 bottom-0 z-[70] md:top-0 md:bottom-auto bg-[#061f12] text-white border-y border-yellow-primary/40 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+      <div className="fixed inset-x-0 bottom-0 z-[70] md:top-0 md:bottom-auto bg-[#061f12] text-white border-y border-[#ffcc00] shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-3">
           <div className="min-w-0 flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-primary text-green-deep shrink-0 animate-pulse">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#ffcc00] text-green-deep shrink-0 animate-pulse">
               <Flame className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] md:text-xs font-black uppercase tracking-wider text-yellow-primary leading-none">
+              <p className="text-[9px] md:text-xs font-black uppercase tracking-wider text-[#ffcc00] leading-none">
                 Convocacao Relampago
               </p>
-              <p className="text-[11px] md:text-sm font-extrabold truncate">
+              <p className="text-[10px] md:text-sm font-extrabold truncate">
                 {remainingCopy} - encerra as {offer.cutoffLabel}
               </p>
             </div>
@@ -200,7 +200,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
           <button
             type="button"
             onClick={() => startPackage("familia")}
-            className="shrink-0 rounded-full bg-yellow-primary text-green-deep px-4 md:px-6 py-2 text-[11px] md:text-sm font-black hover:bg-white transition"
+            className="shrink-0 rounded-full bg-[#ffcc00] text-green-deep px-3 md:px-5 py-1.5 md:py-2 text-[10px] md:text-sm font-black hover:bg-white transition"
           >
             Garantir vaga
           </button>
@@ -219,7 +219,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-8 py-14 w-full">
           <div className="grid lg:grid-cols-[1fr_0.95fr] gap-10 items-center">
             <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }}>
-              <div className="inline-flex items-center gap-2 rounded-full bg-yellow-primary text-green-deep px-4 py-2 font-black text-[10px] uppercase tracking-widest shadow-xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#ffcc00] text-green-deep px-3.5 py-1.5 font-black text-[9px] sm:text-[10px] uppercase tracking-widest shadow-xl">
                 <BellRing className="w-4 h-4" />
                 Escalacao de hoje aberta
               </div>
@@ -231,35 +231,32 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 Entre na Convocacao Relampago: envie sua foto, pague no Pix e receba uma FanCard digital personalizada em ate 1 hora.
               </p>
 
-              <div className="mt-6 grid grid-cols-3 gap-2 max-w-xl">
+              <div className="mt-5 grid grid-cols-3 gap-2 max-w-lg">
                 {[
                   ["1h", "Individual"],
                   ["2h", "Trio/Familia"],
                   [offer.cutoffLabel, "fecha hoje"],
-                ].map(([value, label]) => (
-                  <div key={label} className="rounded-2xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur">
-                    <p className="text-yellow-primary text-xl md:text-2xl font-black leading-none">{value}</p>
+                ].map(([value, label], index) => (
+                  <motion.div
+                    key={label}
+                    className="rounded-xl border-2 border-[#ffcc00] bg-[#061f12] px-2.5 py-2 shadow-xl"
+                    animate={{ y: [0, -4, 0], scale: [1, 1.03, 1] }}
+                    transition={{ duration: 1.35 + index * 0.18, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <p className="text-[#ffcc00] text-lg md:text-2xl font-black leading-none">{value}</p>
                     <p className="text-white/75 text-[10px] md:text-xs font-bold uppercase mt-1">{label}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <div className="mt-7 flex">
                 <button
                   type="button"
                   onClick={() => startPackage("familia")}
-                  className="inline-flex items-center justify-center gap-3 bg-yellow-primary text-green-deep px-8 py-4 rounded-full font-black hover:bg-white hover:-translate-y-0.5 active:translate-y-0 transition shadow-2xl"
+                  className="inline-flex items-center justify-center gap-3 bg-[#ffcc00] text-green-deep px-6 sm:px-8 py-3.5 rounded-full font-black hover:bg-white hover:-translate-y-0.5 active:translate-y-0 transition shadow-2xl text-sm sm:text-base"
                 >
                   PEGAR VAGA RELAMPAGO
                   <ArrowRight className="w-5 h-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={onOpenArquibancada}
-                  className="inline-flex items-center justify-center gap-2 border border-white/30 bg-white/10 text-white px-6 py-4 rounded-full font-black hover:bg-white hover:text-green-deep transition"
-                >
-                  <Trophy className="w-4 h-4" />
-                  Minha Arquibancada
                 </button>
               </div>
 
@@ -274,7 +271,6 @@ export const LandingView: React.FC<LandingViewProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.1 }}
             >
-              <div className="absolute inset-x-8 top-10 h-72 rounded-full bg-yellow-primary/20 blur-3xl" />
               <motion.div
                 className="absolute left-1/2 top-4 z-30 -translate-x-1/2 rotate-[-3deg]"
                 animate={{ y: [0, -10, 0], rotate: [-3, -1, -3] }}
@@ -320,9 +316,9 @@ export const LandingView: React.FC<LandingViewProps> = ({
         </div>
       </section>
 
-      <section className="bg-[#ffe03a] py-14 md:py-18 overflow-hidden">
+      <section className="bg-[#ffcc00] py-12 md:py-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 md:px-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-7">
             <div>
               <p className="mono text-[10px] text-green-primary font-black uppercase">Da foto ao cromo</p>
               <h2 className="display text-3xl md:text-5xl text-[#103c27] mt-2">
@@ -334,7 +330,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-4 gap-0 border-y-2 border-[#103c27] bg-[#ffcc00]">
             {[
               [ImageIcon, "Foto enviada", "voce sobe a imagem com rosto visivel"],
               [Sparkles, "Recorte limpo", "a arte recebe tratamento e encaixe"],
@@ -343,21 +339,20 @@ export const LandingView: React.FC<LandingViewProps> = ({
             ].map(([Icon, title, text], index) => (
               <motion.article
                 key={String(title)}
-                className="relative overflow-hidden rounded-2xl bg-white p-5 border border-black/10 shadow-sm"
+                className="relative p-4 md:p-5 border-b-2 md:border-b-0 md:border-r-2 last:border-r-0 border-[#103c27]"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.45, delay: index * 0.08 }}
               >
-                <div className="absolute inset-x-0 top-0 h-1 bg-green-primary" />
                 <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-full bg-green-primary text-white flex items-center justify-center">
+                  <span className="w-9 h-9 rounded-full bg-[#103c27] text-[#ffcc00] flex items-center justify-center">
                     {React.createElement(Icon as typeof ImageIcon, { className: "w-5 h-5" })}
                   </span>
-                  <span className="mono text-[10px] text-green-primary font-black">0{index + 1}</span>
+                  <span className="mono text-[10px] text-[#103c27] font-black">0{index + 1}</span>
                 </div>
-                <h3 className="mt-5 text-lg font-black text-[#103c27]">{title as string}</h3>
-                <p className="mt-2 text-sm font-semibold text-[#65756b]">{text as string}</p>
+                <h3 className="mt-4 text-base md:text-lg font-black text-[#103c27]">{title as string}</h3>
+                <p className="mt-1.5 text-xs md:text-sm font-bold text-[#103c27]/75">{text as string}</p>
               </motion.article>
             ))}
           </div>
@@ -368,10 +363,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <div className="text-center max-w-3xl mx-auto mb-12">
           <p className="mono text-[10px] text-green-primary font-black uppercase">Vaga de craque</p>
           <h2 className="display text-4xl md:text-6xl text-[#103c27] mt-2">
-            Escolha pelo maior valor primeiro.
+            Monte sua escalacao antes da rodada fechar.
           </h2>
           <p className="mt-4 text-[#65756b] text-base md:text-lg leading-relaxed font-bold">
-            A ordem ja mostra o jogo real: quem pega mais FanCards paga menos por unidade e entra na mesma esteira rapida.
+            FanCard funciona melhor quando vira brincadeira de grupo: familia, amigos, casal, pelada e torcida entrando junto na onda.
           </p>
         </div>
 
@@ -381,16 +376,26 @@ export const LandingView: React.FC<LandingViewProps> = ({
               key={card.id}
               className={`relative rounded-3xl p-7 border shadow-lg flex flex-col ${
                 card.featured
-                  ? "bg-[#072816] text-white border-yellow-primary md:scale-[1.03]"
+                  ? "bg-[#072816] text-white border-[#ffcc00] md:scale-[1.03]"
                   : "bg-white text-[#103c27] border-line-border"
               }`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              animate={card.featured ? { y: [0, -8, 0], rotate: [0, -0.4, 0.4, 0] } : undefined}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.45 }}
+              transition={card.featured ? { duration: 1.65, repeat: Infinity, ease: "easeInOut" } : { duration: 0.45 }}
             >
+              {card.featured && (
+                <motion.div
+                  className="absolute -top-4 left-5 right-5 rounded-full bg-[#ffcc00] text-[#2a0606] border-2 border-[#2a0606] px-3 py-1.5 text-center text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-xl"
+                  animate={{ scale: [1, 1.06, 1], backgroundColor: ["#ffcc00", "#ffef6a", "#ffcc00"] }}
+                  transition={{ duration: 0.85, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  Recomendado - 51% OFF
+                </motion.div>
+              )}
               <span className={`w-max rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider ${
-                card.featured ? "bg-yellow-primary text-green-deep animate-pulse" : "bg-[#ecf4ee] text-green-primary"
+                card.featured ? "mt-3 bg-[#ffcc00] text-green-deep" : "bg-[#ecf4ee] text-green-primary"
               }`}>
                 {card.badge}
               </span>
@@ -415,7 +420,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 onClick={() => startPackage(card.id)}
                 className={`mt-8 rounded-full px-5 py-3.5 font-black text-sm uppercase tracking-wider transition ${
                   card.featured
-                    ? "bg-yellow-primary text-green-deep hover:bg-white"
+                    ? "bg-[#ffcc00] text-green-deep hover:bg-white"
                     : "border-2 border-green-primary text-green-primary hover:bg-green-primary hover:text-white"
                 }`}
               >
@@ -426,26 +431,33 @@ export const LandingView: React.FC<LandingViewProps> = ({
         </div>
       </section>
 
-      <section className="bg-[#061f12] text-white py-18 md:py-24">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 grid lg:grid-cols-[0.85fr_1.15fr] gap-10">
+      <section className="bg-[#061f12] text-white py-16 md:py-22">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 grid lg:grid-cols-[0.85fr_1.15fr] gap-10 items-start">
           <div>
-            <p className="mono text-[10px] text-yellow-primary font-black uppercase">Como funciona</p>
+            <p className="mono text-[10px] text-[#ffcc00] font-black uppercase">Como o pedido funciona</p>
             <h2 className="display text-4xl md:text-5xl mt-3">Quatro lances. Sem perder tempo.</h2>
             <p className="mt-5 text-white/75 font-semibold leading-relaxed">
               O cliente escolhe, envia uma vez, paga no Mercado Pago e acompanha tudo pelo proprio link do pedido.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-0">
             {[
               ["1", "Escolha o pacote", "Familia, Trio ou Individual."],
               ["2", "Envie foto e dados", "Nome, email uma vez, cidade/UF e medidas do card."],
               ["3", "Pague no Pix", "Checkout seguro do Mercado Pago."],
               ["4", "Baixe quando liberar", "A arte aparece na Minha Arquibancada e no pedido."],
-            ].map(([number, title, text]) => (
-              <article key={number} className="rounded-2xl bg-white/8 border border-white/10 p-5">
-                <span className="w-10 h-10 rounded-full bg-yellow-primary text-green-deep flex items-center justify-center font-black">{number}</span>
-                <h3 className="mt-4 font-black text-lg">{title}</h3>
-                <p className="mt-2 text-sm text-white/70 font-semibold">{text}</p>
+            ].map(([number, title, text], index) => (
+              <article key={number} className="relative flex gap-5 pb-7 last:pb-0">
+                {index < 3 && (
+                  <span className="absolute left-5 top-10 bottom-0 w-0.5 bg-[#ffcc00]" />
+                )}
+                <span className="relative z-10 w-10 h-10 rounded-full bg-[#ffcc00] text-green-deep flex items-center justify-center font-black shrink-0 shadow-lg">
+                  {number}
+                </span>
+                <div className="pt-0.5">
+                  <h3 className="font-black text-lg text-white">{title}</h3>
+                  <p className="mt-1.5 text-sm text-white/70 font-semibold leading-relaxed">{text}</p>
+                </div>
               </article>
             ))}
           </div>
@@ -522,7 +534,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
             <button
               type="button"
               onClick={() => startPackage("familia")}
-              className="rounded-full bg-yellow-primary text-green-deep px-8 py-4 font-black hover:bg-white transition"
+              className="rounded-full bg-[#ffcc00] text-green-deep px-6 md:px-8 py-3.5 md:py-4 font-black hover:bg-white transition"
             >
               Quero minha FanCard
             </button>
@@ -564,17 +576,24 @@ export const LandingView: React.FC<LandingViewProps> = ({
               >
                 <X className="w-5 h-5" />
               </button>
-              <span className="inline-flex rounded-full bg-yellow-primary text-green-deep px-3 py-1 text-[10px] font-black uppercase tracking-wider">
+              <span className="inline-flex rounded-full bg-[#ffcc00] text-green-deep px-3 py-1 text-[10px] font-black uppercase tracking-wider">
                 ultima chamada da rodada
               </span>
-              <h2 className="display text-3xl text-[#103c27] mt-4">Ainda da tempo de entrar hoje.</h2>
+              <h2 className="display text-3xl text-[#103c27] mt-4">O motivo pra pegar agora e simples.</h2>
               <p className="mt-3 text-[#65756b] font-bold leading-relaxed">
-                {offer.remaining} vaga(s) da Convocacao Relampago continuam abertas ate {offer.cutoffLabel}. O pacote Familia fica com o menor preco por FanCard.
+                A fila relampago e separada para produzir hoje. Quando as {offer.remaining} vaga(s) acabarem ou passar de {offer.cutoffLabel}, seu pedido entra na proxima chamada e perde a prioridade da rodada.
               </p>
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {["prioridade hoje", "menor preco por arte", "torcida junta"].map((reason) => (
+                  <div key={reason} className="border border-[#103c27] bg-[#ffcc00] px-2 py-2 text-center text-[10px] font-black uppercase text-[#103c27] leading-tight">
+                    {reason}
+                  </div>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={() => startPackage("familia")}
-                className="mt-6 w-full rounded-full bg-yellow-primary text-green-deep px-6 py-4 font-black hover:bg-green-primary hover:text-white transition"
+                className="mt-6 w-full rounded-full bg-[#ffcc00] text-green-deep px-6 py-3.5 font-black hover:bg-green-primary hover:text-white transition"
               >
                 Continuar e garantir vaga
               </button>
