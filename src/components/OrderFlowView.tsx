@@ -19,9 +19,9 @@ interface OrderFlowViewProps {
 }
 
 const packageMap = {
-  individual: { name: "Individual", quantity: 1, price: "R$ 14,90", priceValue: 14.90, deadline: "ate 1 hora" },
-  trio: { name: "Trio", quantity: 3, price: "R$ 26,97", priceValue: 26.97, deadline: "ate 2 horas" },
-  familia: { name: "Família / Amigos", quantity: 5, price: "R$ 35,97", priceValue: 35.97 },
+  individual: { name: "Individual", quantity: 1, price: "R$ 8,97", priceValue: 8.97, deadline: "ate 1 hora" },
+  trio: { name: "Trio", quantity: 3, price: "R$ 17,90", priceValue: 17.90, deadline: "ate 2 horas" },
+  familia: { name: "Família / Amigos", quantity: 5, price: "R$ 22,95", priceValue: 22.95 },
 };
 
 const stepOrder: OrderStep[] = [
@@ -1063,11 +1063,11 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                         </span>
                         <h3 className="font-extrabold text-green-deep text-lg leading-tight">Individual</h3>
                         <p className="text-muted-text text-[11px] font-semibold mt-1">1 figurinha exclusiva</p>
-                        <p className="text-[10px] text-green-primary font-bold mt-1">R$ 14,90 por FanCard</p>
+                        <p className="text-[10px] text-green-primary font-bold mt-1">R$ 8,97 por FanCard</p>
                       </div>
                       <div className="mt-4 pt-4 border-t border-line-border/40 flex items-baseline justify-between w-full">
                         <span className="font-mono text-xs text-muted-text font-bold">INVESTIMENTO</span>
-                        <span className="font-black text-green-primary text-xl">R$ 14,90</span>
+                        <span className="font-black text-green-primary text-xl">R$ 8,97</span>
                       </div>
                     </button>
 
@@ -1082,7 +1082,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                       }`}
                     >
                       <div className="absolute top-3 right-3 bg-yellow-primary/30 text-[#103c27] rounded px-2 py-0.5 text-[8px] font-black tracking-wider uppercase">
-                        GANHE QUASE 40% OFF
+                        GANHE 60% OFF
                       </div>
                       <div className="w-10 h-10 rounded-xl bg-yellow-primary/10 text-yellow-primary flex items-center justify-center">
                         <Compass className="w-5 h-5" />
@@ -1091,11 +1091,11 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                         <span className="text-[9px] text-red-500 font-bold line-through">De R$ 44,70</span>
                         <h3 className="font-extrabold text-[#113a23] text-lg leading-tight">Trio Tático</h3>
                         <p className="text-muted-text text-[11px] font-semibold mt-1">3 figurinhas individuais</p>
-                        <p className="text-[10px] text-green-primary font-bold mt-1">R$ 8,99 por FanCard</p>
+                        <p className="text-[10px] text-green-primary font-bold mt-1">R$ 5,97 por FanCard</p>
                       </div>
                       <div className="mt-4 pt-4 border-t border-line-border/40 flex items-baseline justify-between w-full">
                         <span className="font-mono text-xs text-muted-text font-bold">VALOR</span>
-                        <span className="font-black text-[#103c27] text-xl">R$ 26,97</span>
+                        <span className="font-black text-[#103c27] text-xl">R$ 17,90</span>
                       </div>
                     </button>
 
@@ -1110,7 +1110,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                       }`}
                     >
                       <div className="absolute top-3 right-3 bg-yellow-primary text-green-deep rounded px-2 py-0.5 text-[8px] font-black tracking-wider uppercase animate-pulse">
-                        RECOMENDADO • 51% OFF
+                        RECOMENDADO • 69% OFF
                       </div>
                       <div className="w-10 h-10 rounded-xl bg-yellow-primary text-green-deep flex items-center justify-center shadow-md">
                         <Shield className="w-5 h-5 text-green-deep" />
@@ -1131,14 +1131,14 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                         >
                           5 figurinhas de uma vez • Unidade de Equipe
                         </p>
-                        <p className="text-[11px] text-yellow-primary font-bold mt-1">R$ 7,19 por FanCard</p>
+                        <p className="text-[11px] text-yellow-primary font-bold mt-1">R$ 4,59 por FanCard</p>
                       </div>
 
                       {/* Caixa de Explanação do Combo para impulsionar */}
                       <div className="mt-3 p-2.5 rounded-xl text-[10px] leading-relaxed font-semibold border bg-white/10 border-white/15 text-white/95 flex items-start gap-2">
                         <ShieldAlert className="w-3.5 h-3.5 shrink-0 mt-0.5 text-yellow-primary" />
                         <span>
-                          Por apenas <strong className="text-yellow-primary">R$ 9,00 adicionais</strong> em relação ao Trio, você garante <strong className="text-yellow-primary">+2 figurinhas extras</strong> para sua seleção oficial de clube.
+                          Por apenas <strong className="text-yellow-primary">R$ 5,05 adicionais</strong> em relação ao Trio, você garante <strong className="text-yellow-primary">+2 figurinhas extras</strong> para sua seleção oficial de clube.
                         </span>
                       </div>
 
@@ -1147,7 +1147,7 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
                         <span 
                           className="font-black text-xl text-white"
                         >
-                          R$ 35,97
+                          R$ 22,95
                         </span>
                       </div>
                     </button>

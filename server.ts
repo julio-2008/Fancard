@@ -108,9 +108,9 @@ export async function createApp(options: CreateAppOptions = {}) {
 
   // Official structural pricing definition
   const PRICES: Record<string, number> = {
-    individual: 14.90,
-    trio: 26.97,
-    familia: 35.97,
+    individual: 8.97,
+    trio: 17.90,
+    familia: 22.95,
   };
 
   const PACK_NAMES: Record<string, string> = {
