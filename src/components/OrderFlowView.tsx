@@ -624,6 +624,22 @@ export const OrderFlowView: React.FC<OrderFlowViewProps> = ({
       createdAt: new Date().toISOString(),
     });
 
+    // Track Meta Pixel InitiateCheckout
+    try {
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq("track", "InitiateCheckout", {
+          content_name: data.packageName || packageInfo.name,
+          content_ids: [currentPackageId],
+          content_type: "product",
+          value: packageInfo.priceValue,
+          currency: "BRL",
+          num_items: packageInfo.quantity
+        });
+      }
+    } catch (fbErr) {
+      console.warn("Falha ao rastrear InitiateCheckout:", fbErr);
+    }
+
     // Redirect immediately to Checkout Pro or simulated test window
     if (!data.checkoutUrl) {
       showToast("Erro: Checkout Mercado Pago não retornou URL de pagamento. Tente novamente.");

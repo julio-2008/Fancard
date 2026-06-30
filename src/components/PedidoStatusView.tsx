@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Check, Copy, Download, Loader2, ShieldCheck, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -74,6 +74,27 @@ export function PedidoStatusView({ orderId, accessToken, onBackHome, onOpenArqui
   const [alertsEnabled, setAlertsEnabled] = useState(() => "Notification" in window && Notification.permission === "granted");
   const audioRef = useRef<AudioContext | null>(null);
   const lastReadyNotifiedRef = useRef<string | null>(null);
+  const purchaseTrackedRef = useRef<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (order && order.payment.status === "approved" && !purchaseTrackedRef.current[order.id]) {
+      purchaseTrackedRef.current[order.id] = true;
+      try {
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          (window as any).fbq("track", "Purchase", {
+            value: order.price,
+            currency: "BRL",
+            content_ids: [order.packageId],
+            content_type: "product",
+            content_name: order.packageName,
+            num_items: order.quantity
+          });
+        }
+      } catch (fbErr) {
+        console.warn("Falha ao rastrear Purchase:", fbErr);
+      }
+    }
+  }, [order?.id, order?.payment.status]);
 
   const playReadyAlert = () => {
     try {
