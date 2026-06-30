@@ -165,6 +165,51 @@ export async function createApp(options: CreateAppOptions = {}) {
     };
   };
 
+  // ==================== IMAGE PROXY FOR PRIVATE VERCEL BLOB STORES ====================
+
+  app.get("/api/blob-proxy", async (req, res) => {
+    try {
+      const fileUrl = req.query.url as string;
+      if (!fileUrl) {
+        return res.status(400).send("URL ausente.");
+      }
+
+      // Validar que a URL de destino pertence ao Vercel Storage
+      if (!fileUrl.includes("vercel-storage.com")) {
+        return res.status(400).send("Acesso negado para esta URL.");
+      }
+
+      const token = process.env.BLOB_READ_WRITE_TOKEN;
+      if (!token) {
+        return res.status(500).send("Token da Vercel Blob não configurado.");
+      }
+
+      // Baixar o arquivo usando as credenciais do servidor
+      const response = await fetch(fileUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn(`[Proxy] Erro ao recuperar arquivo ${fileUrl} (Status ${response.status})`);
+        return res.status(response.status).send("Falha ao recuperar arquivo do Blob.");
+      }
+
+      const contentType = response.headers.get("content-type") || "image/png";
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Cache-Control", "public, max-age=31536000"); // Cache de 1 ano
+
+      // Transmitir os bytes da imagem
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      return res.send(buffer);
+    } catch (err) {
+      console.error("Erro no proxy de imagem:", err);
+      return res.status(500).send("Erro interno no processamento da imagem.");
+    }
+  });
+
   // ==================== ADMINISTRATIVE LOGIN API ====================
 
   app.post("/api/admin/login", (req, res) => {

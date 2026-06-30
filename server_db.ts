@@ -109,13 +109,39 @@ export interface Order {
   };
 }
 
+const rewritePrivateBlobUrl = (url: string) => {
+  if (!url) return url;
+  if (url.includes("vercel-storage.com") && !url.includes("/api/blob-proxy")) {
+    return `/api/blob-proxy?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+};
+
 export async function loadOrders(): Promise<Order[]> {
+  const mapOrdersToProxy = (orders: Order[]) => {
+    return orders.map((order) => ({
+      ...order,
+      items: (order.items || []).map((item) => ({
+        ...item,
+        photoUrl: rewritePrivateBlobUrl(item.photoUrl),
+      })),
+      production: {
+        ...order.production,
+        finalFiles: (order.production?.finalFiles || []).map((file) => ({
+          ...file,
+          url: rewritePrivateBlobUrl(file.url),
+        })),
+      },
+    }));
+  };
+
   if (shouldUseBlob()) {
     try {
       const result = await get(ORDERS_BLOB_PATH, { access: "private", useCache: false });
       if (result.statusCode !== 200 || !result.stream) return [];
       const text = await streamToText(result.stream);
-      return JSON.parse(text || "[]");
+      const orders = JSON.parse(text || "[]");
+      return mapOrdersToProxy(orders);
     } catch (err) {
       if (err instanceof BlobNotFoundError) return [];
       console.error("Error reading orders from Vercel Blob:", err);
@@ -126,7 +152,8 @@ export async function loadOrders(): Promise<Order[]> {
   try {
     ensureDirs();
     const data = fs.readFileSync(ORDERS_FILE, "utf-8");
-    return JSON.parse(data);
+    const orders = JSON.parse(data);
+    return mapOrdersToProxy(orders);
   } catch (err) {
     console.error("Error reading local orders:", err);
     return [];
@@ -174,7 +201,7 @@ export async function saveBase64Image(
       contentType: contentTypeFromFileName(safeFileName),
       addRandomSuffix: false,
     });
-    return blob.url;
+    return `/api/blob-proxy?url=${encodeURIComponent(blob.url)}`;
   }
 
   if (process.env.VERCEL) {
