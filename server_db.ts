@@ -170,7 +170,7 @@ export async function saveBase64Image(
 
   if (shouldUseBlob()) {
     const blob = await put(`fancard/uploads/${type}/${uniqueName}`, buffer, {
-      access: "public",
+      access: "private",
       contentType: contentTypeFromFileName(safeFileName),
       addRandomSuffix: false,
     });
