@@ -386,26 +386,37 @@ export const LandingView: React.FC<LandingViewProps> = ({
   return (
     <div className="w-full bg-[#fffdf7] pb-24 md:pb-0">
       {/* ─── Sticky bottom bar (clean, no fake scarcity) ──── */}
-      <div className="fixed inset-x-0 bottom-0 z-[70] bg-[#061f12] text-white border-t border-[#ffcc00]/50 shadow-2xl md:inset-x-auto md:right-4 md:bottom-4 md:w-[420px] md:rounded-2xl md:border">
+      <motion.div
+        className="fixed inset-x-0 bottom-0 z-[70] bg-[#061f12] text-white border-t border-[#ffcc00]/50 shadow-2xl md:inset-x-auto md:right-4 md:bottom-4 md:w-[420px] md:rounded-2xl md:border"
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.5, type: "spring", stiffness: 200 }}
+      >
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="min-w-0 flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#ffcc00] text-[#103c27] shrink-0">
+            <motion.span
+              className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#ffcc00] text-[#103c27] shrink-0"
+              animate={{ scale: [1, 1.15, 1], boxShadow: ["0 0 0px #ffcc00", "0 0 14px #ffcc00aa", "0 0 0px #ffcc00"] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+            >
               <Sparkles className="w-4 h-4" />
-            </span>
+            </motion.span>
             <p className="text-[10px] md:text-sm font-extrabold truncate">
               Sua figurinha digital a partir de{" "}
               <span className="text-[#ffcc00]">R$ 8,97</span>
             </p>
           </div>
-          <button
+          <motion.button
             type="button"
             onClick={() => startPackage("individual")}
             className="shrink-0 rounded-full bg-[#ffcc00] text-[#103c27] px-3 md:px-5 py-1.5 md:py-2 text-[10px] md:text-sm font-black hover:bg-white transition"
+            whileHover={{ scale: 1.07 }}
+            whileTap={{ scale: 0.95 }}
           >
             Criar agora
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* ─── HERO SECTION ──────────────────────────────────── */}
       <section className="relative min-h-[760px] md:min-h-[820px] overflow-hidden flex items-center pt-14 md:pt-20">
@@ -465,14 +476,23 @@ export const LandingView: React.FC<LandingViewProps> = ({
               </div>
 
               <div className="mt-7 flex">
-                <button
+                <motion.button
                   type="button"
                   onClick={() => startPackage()}
-                  className="inline-flex items-center justify-center gap-3 bg-[#ffcc00] text-[#103c27] px-6 sm:px-8 py-3.5 rounded-full font-black hover:bg-white hover:-translate-y-0.5 active:translate-y-0 transition shadow-2xl text-sm sm:text-base"
+                  className="inline-flex items-center justify-center gap-3 bg-[#ffcc00] text-[#103c27] px-6 sm:px-8 py-3.5 rounded-full font-black hover:bg-white transition shadow-2xl text-sm sm:text-base"
+                  whileHover={{ scale: 1.06, y: -3 }}
+                  whileTap={{ scale: 0.97 }}
+                  animate={{ boxShadow: ["0 8px 30px #ffcc0050", "0 8px 50px #ffcc0099", "0 8px 30px #ffcc0050"] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 >
                   CRIAR MINHA FIGURINHA
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+                  <motion.span
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.span>
+                </motion.button>
               </div>
 
               <p className="mt-4 text-white/70 text-xs md:text-sm font-semibold">
@@ -562,10 +582,15 @@ export const LandingView: React.FC<LandingViewProps> = ({
               "Download no seu pedido",
               "Quando ficar pronto, o arquivo HD aparece no link do pedido. Sem spam.",
             ],
-          ].map(([Icon, title, text]) => (
-            <article
+          ].map(([Icon, title, text], i) => (
+            <motion.article
               key={String(title)}
               className="rounded-2xl border border-line-border bg-[#fff9e9] p-5"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.45, delay: i * 0.12 }}
+              whileHover={{ y: -4, boxShadow: "0 12px 30px rgba(16,60,39,0.10)" }}
             >
               {React.createElement(Icon as typeof ShieldCheck, {
                 className: "w-6 h-6 text-green-primary mb-3",
@@ -574,7 +599,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
               <p className="text-sm text-[#65756b] font-semibold mt-2">
                 {text as string}
               </p>
-            </article>
+            </motion.article>
           ))}
         </div>
       </section>
@@ -582,7 +607,13 @@ export const LandingView: React.FC<LandingViewProps> = ({
       {/* ─── How it works (step by step) ───────────────────── */}
       <section className="bg-[#ffcc00] py-12 md:py-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 md:px-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-7">
+          <motion.div
+            className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-7"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55 }}
+          >
             <div>
               <p className="mono text-[10px] text-green-primary font-black uppercase">
                 Da foto ao cromo
@@ -595,7 +626,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
               Processo rápido, visual e fácil de acompanhar — da sua foto até a
               arte final.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
@@ -753,7 +784,12 @@ export const LandingView: React.FC<LandingViewProps> = ({
       {/* ─── Detailed steps ────────────────────────────────── */}
       <section className="bg-[#061f12] text-white py-16 md:py-22">
         <div className="max-w-7xl mx-auto px-5 md:px-8 grid lg:grid-cols-[0.85fr_1.15fr] gap-10 items-start">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55 }}
+          >
             <p className="mono text-[10px] text-[#ffcc00] font-black uppercase">
               Passo a passo do pedido
             </p>
@@ -764,7 +800,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
               Escolha o pacote, envie a foto, pague pelo Mercado Pago e
               acompanhe tudo pelo link do pedido.
             </p>
-          </div>
+          </motion.div>
           <div className="space-y-0">
             {[
               [
@@ -788,20 +824,31 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 "A arte HD aparece no link do seu pedido para download.",
               ],
             ].map(([number, title, text], index) => (
-              <article key={number} className="relative flex gap-5 pb-7 last:pb-0">
+              <motion.article
+                key={number}
+                className="relative flex gap-5 pb-7 last:pb-0"
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.45, delay: index * 0.12 }}
+              >
                 {index < 3 && (
                   <span className="absolute left-5 top-10 bottom-0 w-0.5 bg-[#ffcc00]" />
                 )}
-                <span className="relative z-10 w-10 h-10 rounded-full bg-[#ffcc00] text-green-deep flex items-center justify-center font-black shrink-0 shadow-lg">
+                <motion.span
+                  className="relative z-10 w-10 h-10 rounded-full bg-[#ffcc00] text-green-deep flex items-center justify-center font-black shrink-0 shadow-lg"
+                  whileHover={{ scale: 1.2, rotate: 8 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
                   {number}
-                </span>
+                </motion.span>
                 <div className="pt-0.5">
                   <h3 className="font-black text-lg text-white">{title}</h3>
                   <p className="mt-1.5 text-sm text-white/70 font-semibold leading-relaxed">
                     {text}
                   </p>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
@@ -810,7 +857,12 @@ export const LandingView: React.FC<LandingViewProps> = ({
       {/* ─── FAQ ────────────────────────────────────────────── */}
       <section className="bg-white py-18 md:py-24 border-b border-line-border">
         <div className="max-w-7xl mx-auto px-5 md:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-10">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55 }}
+          >
             <p className="mono text-[10px] text-green-primary font-black uppercase">
               Dúvidas frequentes
             </p>
@@ -820,7 +872,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
             <p className="mt-4 text-[#65756b] font-bold">
               Tudo que você precisa saber antes de criar sua figurinha digital.
             </p>
-          </div>
+          </motion.div>
           <div className="space-y-3">
             {[
               [
@@ -843,21 +895,25 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 "Preciso ficar no site?",
                 "Não. O pedido fica salvo e o link pode ser acessado depois pelo e-mail usado na compra. Quando a arte ficar pronta, o download aparece lá.",
               ],
-            ].map(([question, answer]) => (
-              <details
+            ].map(([question, answer], i) => (
+              <motion.details
                 key={question}
                 className="group rounded-2xl border border-line-border bg-[#fff9e9] p-5"
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
               >
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-black text-[#103c27]">
                   {question}
-                  <span className="text-green-primary group-open:rotate-45 transition">
+                  <span className="text-green-primary group-open:rotate-45 transition-transform duration-200">
                     +
                   </span>
                 </summary>
                 <p className="mt-3 text-sm text-[#65756b] leading-relaxed font-semibold">
                   {answer}
                 </p>
-              </details>
+              </motion.details>
             ))}
           </div>
         </div>
@@ -867,19 +923,30 @@ export const LandingView: React.FC<LandingViewProps> = ({
       {feedbacks.length > 0 && (
         <section className="bg-[#fffdf7] py-16 border-b border-line-border">
           <div className="max-w-7xl mx-auto px-5 md:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-10">
+            <motion.div
+              className="text-center max-w-2xl mx-auto mb-10"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5 }}
+            >
               <p className="mono text-green-primary font-black uppercase text-xs">
                 Avaliações reais
               </p>
               <h2 className="display text-4xl text-[#103c27] mt-2">
                 Quem recebeu já avaliou.
               </h2>
-            </div>
+            </motion.div>
             <div className="grid md:grid-cols-3 gap-5">
-              {feedbacks.slice(0, 6).map((feedback) => (
-                <article
+              {feedbacks.slice(0, 6).map((feedback, i) => (
+                <motion.article
                   key={feedback.id}
                   className="border border-line-border rounded-2xl p-5 bg-white"
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, delay: i * 0.09 }}
+                  whileHover={{ y: -5, boxShadow: "0 12px 28px rgba(16,60,39,0.09)" }}
                 >
                   <div className="text-yellow-500 text-sm font-black mb-3">
                     {"★".repeat(Math.max(1, Math.min(5, feedback.rating)))}
@@ -893,7 +960,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
                   <p className="text-[10px] text-[#65756b] font-bold mt-1">
                     {feedback.packageName}
                   </p>
-                </article>
+                </motion.article>
               ))}
             </div>
           </div>
@@ -902,7 +969,13 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
       {/* ─── Final CTA ─────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-5 md:px-8 py-18">
-        <div className="relative overflow-hidden rounded-[30px] bg-[#082816] text-white p-7 md:p-12 shadow-2xl">
+        <motion.div
+          className="relative overflow-hidden rounded-[30px] bg-[#082816] text-white p-7 md:p-12 shadow-2xl"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+        >
           <img
             className="absolute inset-0 w-full h-full object-cover opacity-30"
             src="/assets/imagem.png"
@@ -910,7 +983,12 @@ export const LandingView: React.FC<LandingViewProps> = ({
             referrerPolicy="no-referrer"
           />
           <div className="relative z-10 grid md:grid-cols-[1fr_auto] gap-6 items-center">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, delay: 0.15 }}
+            >
               <p className="mono text-[10px] text-yellow-primary font-black uppercase">
                 Comece agora
               </p>
@@ -921,16 +999,23 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 Envie sua foto, personalize os dados e receba uma arte HD —
                 pronta para postar ou imprimir como adesivo.
               </p>
-            </div>
-            <button
+            </motion.div>
+            <motion.button
               type="button"
               onClick={() => startPackage()}
               className="rounded-full bg-[#ffcc00] text-green-deep px-6 md:px-8 py-3.5 md:py-4 font-black hover:bg-white transition"
+              initial={{ opacity: 0, scale: 0.85 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.3, type: "spring", stiffness: 200 }}
+              whileHover={{ scale: 1.07 }}
+              whileTap={{ scale: 0.96 }}
+              animate={{ boxShadow: ["0 0 0px #ffcc0000", "0 0 40px #ffcc0088", "0 0 0px #ffcc0000"] }}
             >
               Começar agora — R$ 8,97
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ─── Footer ────────────────────────────────────────── */}
