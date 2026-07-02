@@ -368,6 +368,12 @@ export async function createApp(options: CreateAppOptions = {}) {
         },
       };
 
+      // Persist the order immediately so the admin panel can see purchase attempts
+      // even if the Mercado Pago preference creation fails later.
+      let orders = await loadOrders();
+      orders.push(newOrder);
+      await saveOrders(orders);
+
       // 4. Mercado Pago Preference Creation Setup
       const accessTokenMP = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
       const hostUrl = process.env.APP_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
@@ -444,13 +450,29 @@ export async function createApp(options: CreateAppOptions = {}) {
         }
 
         const prefData = await mpResponse.json();
-        newOrder.payment.preferenceId = prefData.id;
-        newOrder.payment.checkoutUrl = prefData.init_point;
-        newOrder.payment.status = "pending";
-
-        const orders = await loadOrders();
-        orders.push(newOrder);
-        await saveOrders(orders);
+        {
+          orders = await loadOrders();
+          const orderIndex = orders.findIndex((order) => order.id === orderId);
+          if (orderIndex >= 0) {
+            orders[orderIndex] = {
+              ...orders[orderIndex],
+              updatedAt: new Date().toISOString(),
+              payment: {
+                ...orders[orderIndex].payment,
+                preferenceId: prefData.id,
+                checkoutUrl: prefData.init_point,
+                status: "pending",
+              },
+            };
+          } else {
+            newOrder.payment.preferenceId = prefData.id;
+            newOrder.payment.checkoutUrl = prefData.init_point;
+            newOrder.payment.status = "pending";
+            newOrder.updatedAt = new Date().toISOString();
+            orders.push(newOrder);
+          }
+          await saveOrders(orders);
+        }
 
         return res.json({
           status: "success",
@@ -467,6 +489,24 @@ export async function createApp(options: CreateAppOptions = {}) {
         console.warn(`[Mercado Pago] Falha na comunicação com gateway de pagamento (${mpErr?.message || mpErr}). Usando modo simulado de fallback.`);
         
         if (process.env.NODE_ENV === "production") {
+          try {
+            const orders = await loadOrders();
+            const orderIndex = orders.findIndex((order) => order.id === orderId);
+            if (orderIndex >= 0) {
+              orders[orderIndex] = {
+                ...orders[orderIndex],
+                updatedAt: new Date().toISOString(),
+                payment: {
+                  ...orders[orderIndex].payment,
+                  status: "rejected",
+                },
+              };
+              await saveOrders(orders);
+            }
+          } catch (persistErr) {
+            console.error("[Mercado Pago] Falha ao registrar pedido rejeitado no banco:", persistErr);
+          }
+
           return res.status(502).json({
             error: "Não foi possível gerar o checkout do Mercado Pago agora. Tente novamente em alguns minutos.",
           });
